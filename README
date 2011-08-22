@@ -1,0 +1,34 @@
+
+
+Timeline is a schedule widget, initially built for Rails, that uses
+Javascript, prototype.js and AJAX to show how resources are used over time.
+The basic building-block is a DOM block (a resource row) containing a label
+and a timespan:
+
+                +-------+----------------------+
+                | label |       timespan       |
+                |       | block | ... | block  |
+                +-------+----------------------+
+
+The timespan contains of a set of blocks, each describing the use of that
+resource over an interval in that timespan.
+
+If the resource is "Channel 3" you have one row of a tv schedule; each block
+is a program.  (See the example Rails app in example/tv.)  Resource rows stack
+atop one-another and the timespans scroll left or right.  All the timespans in
+a schedule scroll in lock-step.
+
+Time is represented in the usual seconds-since-Jan-1-1970-GMT.  The only thing
+time-specific about this as the X-axis is that it maps to an continuous
+integer range.
+
+The representation is flexible.  For example, headers showing time-of-day (See
+the example app.) are just another kind of resource -- one whose label is
+simply the text "Hour" and whose blocks are time segments with text: "9:30",
+"9:45"...  Same applies for the date header.
+
+Time blocks of all resources are clipped to the visible part of the schedule.
+So you can also create, in effect, non-scrolling toolbars or headers just by
+making a resource with a single time block having very small/large
+starttime/endtime.
+
