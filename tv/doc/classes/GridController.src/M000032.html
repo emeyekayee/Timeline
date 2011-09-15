@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>get_data_for_time_span (GridController)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File app/controllers/grid_controller.rb, line 51</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get_data_for_time_span</span>()
+
+    <span class="ruby-ivar">@t1</span> = <span class="ruby-constant">Time</span>.<span class="ruby-identifier">at</span>(<span class="ruby-ivar">@t1</span>.<span class="ruby-identifier">to_i</span>)  <span class="ruby-comment cmt"># Huh?  XXXX</span>
+    <span class="ruby-ivar">@t2</span> = <span class="ruby-constant">Time</span>.<span class="ruby-identifier">at</span>(<span class="ruby-ivar">@t2</span>.<span class="ruby-identifier">to_i</span>)  <span class="ruby-comment cmt"># Huh?  XXXX</span>
+
+    <span class="ruby-ivar">@rsrcs</span> = <span class="ruby-constant">SchedResource</span>.<span class="ruby-identifier">resourceList</span>
+
+    <span class="ruby-comment cmt"># logger.info &quot;SchedResource.resourceList: &quot;</span>
+    <span class="ruby-comment cmt"># @rsrcs.each{|r| logger.info &quot;        #{r.to_s}&quot;}</span>
+
+    <span class="ruby-ivar">@blockss</span> = <span class="ruby-constant">SchedResource</span>.<span class="ruby-identifier">get_all_blocks</span>(<span class="ruby-ivar">@t1</span>, <span class="ruby-ivar">@t2</span>, <span class="ruby-ivar">@inc</span>, <span class="ruby-identifier">logger</span>)
+
+    <span class="ruby-comment cmt"># logger.info &quot;GridController: #{@blockss.length}&quot;</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

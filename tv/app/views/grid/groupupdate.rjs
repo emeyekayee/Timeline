@@ -1,0 +1,17 @@
+#     debug(params) + debug(session) + debug(response)
+
+@rsrcs.each do |rsrc|
+  # logger.info "\n--- rsrc: #{rsrc.inspect} \n"
+
+  html = render(:partial => 'spancontent', :object => (@blockss[rsrc] || []))
+
+  if    (@inc == "hi"): page.insert_html(:bottom, "timespan#{rsrc}", html)
+  elsif (@inc == "lo"): page.insert_html(:top,    "timespan#{rsrc}", html)
+  else                  page.replace_html(        "timespan#{rsrc}", html)
+  end
+
+end     
+
+# page.insert_html(:bottom, "tooltips",  @details.slice!(0..-1))    XXXX
+
+page.call( 'after_update' );

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>get_all_blocks (SchedResource)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File app/models/sched_resource.rb, line 61</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">get_all_blocks</span>(<span class="ruby-identifier">t1</span>, <span class="ruby-identifier">t2</span>, <span class="ruby-identifier">inc</span>, <span class="ruby-identifier">logger</span>)
+    <span class="ruby-identifier">blockss</span> = {}
+
+    <span class="ruby-ivar">@@config</span>[<span class="ruby-identifier">:rsrcs_by_kind</span>].<span class="ruby-identifier">each</span>{ <span class="ruby-operator">|</span><span class="ruby-identifier">kind</span>, <span class="ruby-identifier">rsrcs</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">rubClass</span> = <span class="ruby-ivar">@@config</span>[<span class="ruby-identifier">:blockClassForResourceKind</span>][ <span class="ruby-identifier">kind</span> ]
+      <span class="ruby-identifier">ridBlks</span> = <span class="ruby-identifier">rubClass</span>.<span class="ruby-identifier">get_all_blocks</span>( <span class="ruby-identifier">rsrcs</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">subId</span>}, <span class="ruby-identifier">t1</span>, <span class="ruby-identifier">t2</span> )
+
+      <span class="ruby-identifier">ridBlks</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">rid</span>, <span class="ruby-identifier">blks</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">rsrc</span> = <span class="ruby-identifier">getFor</span>( <span class="ruby-identifier">kind</span>, <span class="ruby-identifier">rid</span> )
+        <span class="ruby-identifier">blockss</span>[ <span class="ruby-identifier">rsrc</span> ] = <span class="ruby-identifier">blks</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">blk</span><span class="ruby-operator">|</span> <span class="ruby-constant">ResourceUseBlock</span>.<span class="ruby-identifier">new</span>( <span class="ruby-identifier">rsrc</span>, <span class="ruby-identifier">blk</span> ) }
+      }
+    }
+
+    <span class="ruby-identifier">blockss</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>
