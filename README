@@ -13,7 +13,7 @@ label and a timespan:
 The timespan contains a set of "use blocks", each describing the use of that
 resource for an interval in that timespan.  If the resource is "Channel 3"
 and each block is a "tv program" you have one row of a tv schedule.  See the
-example Rails app in example/tv.
+example Rails app in tv/ and Screenshot.png.
 
 Resource rows stack atop one-another and the timespans scroll left or right.
 All the timespans in a schedule scroll in lock-step and new blocks are fetched
