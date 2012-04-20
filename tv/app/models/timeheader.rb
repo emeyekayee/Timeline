@@ -1,41 +1,42 @@
 # timeheader.rb
-# Copyright (c) 2008-2011 Mike Cannon (http://github.com/emeyekayee/Timeline)
+# Copyright (c) 2008-2012 Mike Cannon (http://github.com/emeyekayee/Timeline)
 #                                     (michael.j.cannon@gmail.com)
-# This is a resource class for time-based headers.  Neither this or
-# the resource use class Timelabel use ActiveRecord.  There are some
-# games played with the resource id here too.  More on that later.
-# See class Timeheader
+# This is a resource class (model) for time-based headers (rows in the schedule).
+# Here and in timelabel.rb a resource id also determines subclasses.
+# More on that below. See classes Timeheader, Timelabel.
 
 require 'timelabel'
 
 class Timeheader
+  
+  # The id here, e.g. "hour0", is an alpha string like "hour" or
+  # "dayNight" (the variant), indicating subclasses of Timelabel.
+  # It is followed by non-alpha and other uniquifying chars
+  def self.variantOfId( rid ); rid =~ /^[a-zA-Z]+/; $& end
 
-  # has_many   :timelabels (wink)
+  def self.label_subclass_for(rid) eval "Timelabel#{variantOfId(rid)}" end
 
-  @@header_by_id = Hash.new{ |hash, key|  
-                     hash[key] = self.new( key )
-                     }
+  @@header_by_rid = Hash.new{ |hash, key| # key is rid 
+                              hash[key] = self.new( key )
+                             }
 
-  # The id here is a String like "hour" or "dayNight" (variants of Timelabel)
-  # followed by non-alpha +other uniquifying chars eg: "hour0"
-  def self.variantOfId( id ); id =~ /^[a-zA-Z]+/; $& end
+  # For SchedResource
+  # Return Timeheader object from resource id (string)
+  def self.find_as_schedule_resource(rid)  @@header_by_rid[rid]  end
 
-  def initialize( id )
-    @id = id
-    @variant = self.class.variantOfId id
-  end
+  def initialize( rid ) @rid = rid end
 
-
-  # Methods for SchedResource
-
-  # Return Timelabel object from resource id (String)
-  def self.find_as_schedule_resource (rid)
-    @@header_by_id[rid]
-  end
-
+  # For SchedResource
   def decorateResource( rsrc )
-    rsrc.label = Timelabel.labelForVariant( @variant )
-    rsrc.title = @id
+    rsrc.label = Timeheader.label_subclass_for( @rid ).label
+    rsrc.title = @rid
   end
 
 end  
+
+class TimeheaderdayNight < Timeheader
+end
+
+class Timeheaderhour < Timeheader
+end
+

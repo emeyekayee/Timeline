@@ -1,10 +1,10 @@
 # program.rb
-# Copyright (c) 2008-2011 Mike Cannon (http://github.com/emeyekayee/Timeline)
+# Copyright (c) 2008-2012 Mike Cannon (http://github.com/emeyekayee/Timeline)
 # (michael.j.cannon@gmail.com)
 
 class Program < ActiveRecord::Base
-  set_table_name    "program"
-  
+  self.table_name = "program"
+
   belongs_to        :channel,
                     :class_name   => "Channel",
                     :foreign_key  => "chanid" 
@@ -14,23 +14,33 @@ class Program < ActiveRecord::Base
   @@program_attrs = %w(
     chanid title subtitle description starttime endtime 
     category category_type stars airdate previouslyshown).join(', ')
-
+  
   # Returns a hash where each key is a <tt>SchedResource</tt> object
   # corresponding to a resource id and the value is an array of
   # blocks in the interval <tt>t1...t2</tt>, ordered by
   # <tt>starttime</tt>.
   #
+  # What <em>in</em> mean depends on *inc*.  If inc(remental) is 
+  # false, client is building interval from scratch.  If "hi", 
+  # it is an addition to an existing interval on the high side.
+  #
   # Here the resource is a channel and the blocks are programs.
   # 
-  def Program.get_all_blocks( rIds, t1, t2 )
+  def Program.get_all_blocks( rIds, t1, t2, inc )
     chanids = rIds.map{ |rId| Channel.find_as_schedule_resource(rId).chanid }
     
-    conds = [ "(endtime   > ?) AND " +
-              "(starttime < ?) AND " +
-              "(chanid IN (?))",
-              t1,
-              t2,
-              chanids ] 
+    condlo = "(endtime) > "
+    condlo = "(starttime) >=" if inc == 'hi'
+    
+    condhi = "(starttime) <"
+    condhi = "(endtime) <=" if inc == 'lo'
+
+    conds = [ "(chanid IN (?))             AND " +
+              "(UNIX_TIMESTAMP#{condlo} ?) AND " +
+              "(UNIX_TIMESTAMP#{condhi} ?)",
+              chanids,
+              t1.to_i,
+              t2.to_i ]
 
     opts = { :select => @@program_attrs, :conditions => conds, 
              :order => "chanid MOD 1000, starttime"}
@@ -75,11 +85,13 @@ class Program < ActiveRecord::Base
     ct = self.category_type
     ct  &&  ct !~ /unknown/i  &&
       classes << " type_" + ct.gsub( /[^a-zA-Z0-9\-_]+/, '_' )
-
     classes << " " + to_css_class(self.category)
-
     self.css_classes = classes
-    self.block_label = "#{self.title}:<br/>&nbsp;#{self.subtitle}"
+
+    label = "#{self.title}"
+    label += ":<br/>&nbsp;#{self.subtitle}" if self.subtitle.length > 0
+            "#{self.title}:<br/>&nbsp;#{self.subtitle}"
+    self.block_label = label.html_safe
   end
 
 
@@ -96,7 +108,7 @@ protected
         end
       }
 
-      if ! clss: clss = @@css_translation_cache[ cat ] = 'cat_Unknown' end
+      clss ||= @@css_translation_cache[ cat ] = 'cat_Unknown' 
     end
     
     clss
@@ -152,23 +164,27 @@ protected
     'movie'          =>  ['Movie'  ]
       }
 
-    
-
-  # ScheduledResource protocol...
-
-  # OBSOLETE
-  # 
-  # Assigns a block id -- nothing to do with the database
-  @@serial = 0
-  # 
-  #        What *in* mean depends on INC.  If INC(remental) is false,
-  #        client is building interval from scratch.  If "hi", it is
-  #        an addition to an existing interval on the high side...
-
 end
 
 
 
+# After initial creation of class Program...
+Program.define_attribute_methods()
+
+TZ_OFFSET = Time.now.gmt_offset     # => -25200 
+
+class Program < ActiveRecord::Base
+  def starttime_with_local_tz()  
+    (starttime_without_local_tz - TZ_OFFSET).localtime 
+  end
+
+  def endtime_with_local_tz()
+    (endtime_without_local_tz - TZ_OFFSET).localtime
+  end
+
+  alias_method_chain(:starttime, :local_tz)
+  alias_method_chain(  :endtime, :local_tz)
+end
 
 
 

@@ -1,0 +1,23 @@
+# Configuration file for Timeline schedule widget.
+# 
+
+ResourceKinds:
+# Resource:             Resource Use
+  Channel:              Program
+  TimeheaderdayNight:   TimelabeldayNight
+  Timeheaderhour:       Timelabelhour
+
+visibleTime: 3.hours
+       
+Resources:
+   - TimeheaderdayNight   dayNight0
+   - Timeheaderhour       hour0
+   - Channel              60  189 190 204
+   - Timeheaderhour       hour1
+   - Channel              37 737 42 738 756 757 49 798
+   # - Channel       
+   #                    738
+
+
+
+
