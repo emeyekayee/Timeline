@@ -1,5 +1,5 @@
 <!-- _spancontent.html.erb                                 -->
-<!-- Copyright (c) 2006-2011 Mike Cannon                   -->
+<!-- Copyright (c) 2006-2012 Mike Cannon                   -->
 <!--               (http://github.com/emeyekayee/Timeline) -->
 <!--               (michael.j.cannon@gmail.com)            -->
 
@@ -10,10 +10,9 @@
        <%= "starttime='#{block.starttime.to_i}' 
             endtime='#{block.endtime.to_i}'"%> >
     <div class="blockclip">  
-      <a href="#" ><%= block.block_label %></a>
+      <a href="#" ><%= block.block_label %></a>                   
     </div>
-      <%= render(:partial => 'block_internal', 
-                 :object  => block            ) %>   
+    <%= render(:partial => 'block_internal', :object  => block) %>
   </div>
 
 <% end%>

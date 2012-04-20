@@ -1,11 +1,6 @@
-<!-- _block_internal.html.erb                              -->
-<!-- Copyright (c) 2006-2011 Mike Cannon                   -->
-<!--               (http://github.com/emeyekayee/Timeline) -->
-<!--               (michael.j.cannon@gmail.com)            -->
 
-<% block = block_internal 
-   if block.kind =~ /^ch/i
-%>
+<% block = block_internal                                   %>
+<% if block.kind =~ /^ch/i                                  %>
     <div class="tt" style="display: none;">
       <dl class="detail_list">
         
@@ -29,7 +24,7 @@
           <%= h(v) %>
           <% prop = (v.to_f * 46 + 2).to_s + 'px;' %>
           <div class="starsclip" style="width: <%=prop%>">
-            <img src="images/stars.gif" />
+            <img src="/assets/stars.gif" />
           </div>
         </dd>
       <% end %>
@@ -39,7 +34,7 @@
 
         <dt>Category:</dt> <dd> <%= h(block.category) %> </dd>
 
-      <% if( (v = block.previouslyshown) && v.to_i != 0) %>  
+      <% if  block.previouslyshown  %>  
         <dt>Rerun:</dt> <dd> Yes </dd> <% end %>
 
       </dl>
