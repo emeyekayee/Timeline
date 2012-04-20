@@ -1,4 +1,7 @@
 # Emacs backup files, except this one:
 *~
-! foo~
+# ! foo~
 rdoc/
+
+# Log files
+*.log
