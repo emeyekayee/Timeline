@@ -12,9 +12,9 @@ class Timeheader
   # The id here, e.g. "hour0", is an alpha string like "hour" or
   # "dayNight" (the variant), indicating subclasses of Timelabel.
   # It is followed by non-alpha and other uniquifying chars
-  def self.variantOfId( rid ); rid =~ /^[a-zA-Z]+/; $& end
+  # def self.variantOfId( rid ); rid =~ /^[a-zA-Z]+/; $& end
 
-  def self.label_subclass_for(rid) eval "Timelabel#{variantOfId(rid)}" end
+  # def self.label_subclass_for(rid) eval "Timelabel#{variantOfId(rid)}" end
 
   @@header_by_rid = Hash.new{ |hash, key| # key is rid 
                               hash[key] = self.new( key )
@@ -28,7 +28,7 @@ class Timeheader
 
   # For SchedResource
   def decorateResource( rsrc )
-    rsrc.label = Timeheader.label_subclass_for( @rid ).label
+    rsrc.label = SchedResource.block_class_for_resource_name self.class.name  # Timeheader.label_subclass_for( @rid ).label
     rsrc.title = @rid
   end
 

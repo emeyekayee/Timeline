@@ -63,7 +63,7 @@ class SchedResource
     blockss = {}
 
     @@config[:rsrcs_by_kind].each{ |kind, rsrcs|
-      rubClass = @@config[:blockClassForResourceKind][ kind ]
+      rubClass =  block_class_for_resource_name( kind )
       ruBlks = rubClass.get_all_blocks( rsrcs.map{|r| r.subId}, t1, t2, inc )
 
       ruBlks.each { |rid, blks|
@@ -73,6 +73,10 @@ class SchedResource
     }
 
     blockss
+  end
+
+  def self.block_class_for_resource_name( name )
+    @@config[:blockClassForResourceKind][name]
   end
 
 
