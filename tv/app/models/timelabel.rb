@@ -24,7 +24,7 @@ class Timelabel
   end
 
   def Timelabel.get_timeblocks(id, t1, t2, inc)
-    klass = Timeheader.label_subclass_for id 
+    klass = self  # klass = Timeheader.label_subclass_for id 
     it0, it2, itb = [klass.floor(t1), t2, klass.t_block].map(&:to_i)
 
     it0 += itb if inc == 'hi'
