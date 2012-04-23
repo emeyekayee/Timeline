@@ -17,14 +17,12 @@ class Timelabel
   end
 
   # ScheduledResource protocol...
-  #   Builds a hash: { resourceId => list-of-blocks, ... }
   def Timelabel.get_all_blocks(ids, t1, t2, inc)
-    # Hash[ ids.map{|id| [ id, get_timeblocks(id, t1, t2) ]}.flatten(1) ]
     h = {}; ids.each{|id| h[id] = get_timeblocks(id, t1, t2, inc)}; h
   end
 
   def Timelabel.get_timeblocks(id, t1, t2, inc)
-    klass = self  # klass = Timeheader.label_subclass_for id 
+    klass = self
     it0, it2, itb = [klass.floor(t1), t2, klass.t_block].map(&:to_i)
 
     it0 += itb if inc == 'hi'
@@ -41,11 +39,6 @@ class Timelabelhour < Timelabel
   self.label   = 'Hour'
   self.format  = '%I:%M'
   self.t_block = 15.minutes
-
-  # def initialize( t )
-  #   super
-  #   @block_label = t.strftime(self.format).html_safe
-  # end
 end
 
 class TimelabeldayNight < Timelabel

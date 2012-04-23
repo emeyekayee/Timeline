@@ -8,21 +8,10 @@
 require 'timelabel'
 
 class Timeheader
-  
-  # The id here, e.g. "hour0", is an alpha string like "hour" or
-  # "dayNight" (the variant), indicating subclasses of Timelabel.
-  # It is followed by non-alpha and other uniquifying chars
-  def self.variantOfId( rid ); rid =~ /^[a-zA-Z]+/; $& end
-
-  def self.label_subclass_for(rid) eval "Timelabel#{variantOfId(rid)}" end
-
-  @@header_by_rid = Hash.new
-                            # { |hash, key| # key is rid 
-                            #   hash[key] = self.new( key )
-                            #  }
+  @@header_by_rid = {}
 
   # For SchedResource
-  # Return Timeheader object from resource id (string)
+  # Return Timeheader* object from resource id (string)
   def self.find_as_schedule_resource(rid)
     @@header_by_rid[rid] || (@@header_by_rid[rid] = new(rid))
   end
@@ -33,12 +22,8 @@ class Timeheader
 
   # For SchedResource
   def decorateResource( rsrc )
-    # Timeheader.label_subclass_for( @rid ).label
-    # puts "\nCalling Timeheader???.decorateResource()"
-    # require 'ripl'
-    # Ripl.start :binding => binding    
-    
-    rsrc.label = SchedResource.block_class_for_resource_name(self.class.name).label
+    klass = SchedResource.block_class_for_resource_name(self.class.name)
+    rsrc.label = klass.label
     rsrc.title = @rid
   end
 
