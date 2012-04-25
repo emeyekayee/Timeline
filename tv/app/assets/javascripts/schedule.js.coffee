@@ -1,0 +1,189 @@
+
+class ResourceSchedule
+  lowater:     1800
+  hiwater:     3600
+  ten_min:      600
+  fifteen_min:  900
+  debug:       false
+
+  constructor: (@schedElt) ->
+    @tss = $(".timespan", @schedElt)
+
+    wide = document.body.clientWidth - 4
+    @spanwidth = wide - @tss[0].offsetLeft - 2
+    @schedElt.width wide+"px"
+
+    @init_time_bounds()
+    @init_timespans()
+
+    @schedElt.delegate ".blockdiv a", "mouseover", InfoPopup.mouseOverOutHand
+    @schedElt.delegate ".blockdiv a", "mouseout",  InfoPopup.mouseOverOutHand
+
+
+  init_time_bounds: ->
+    # Time range [@t0..@tn ] will be visible.
+    # Time range [@tlo..@thi] is where the DOM has data.
+    a = (parseInt($(@schedElt).attr t) for t in ['starttime', 'endtime'])
+    [@tlo, @thi] = [@t0, @tn] = a
+
+    # (@new_tlo || @new_thi) means An AJAX request is pending and will be
+    @new_tlo = @new_thi = null   # the new bound when request is completed.
+
+  init_timespans: ->
+    @timespans =
+      (new ResourceUseTimeSpan(this,ts,@spanwidth,@t0,@tn) for ts in @tss)
+
+
+  slide_time: (delta) ->
+    return false  if ( @new_thi || @new_tlo )  # --OR-- queue the request  XXXX
+    @t0 += delta
+    @tn += delta
+
+    @time_update_view()
+
+    if delta >= 0
+      if (@thi - @tn) < @lowater
+        @new_thi = @tn + @hiwater
+        @request_data {t1: @thi, t2: @new_thi, inc: "hi"}
+    else
+      if (@t0 - @tlo) < @lowater
+        @new_tlo = @t0 - @hiwater
+        @request_data {t1: @new_tlo, t2: @tlo, inc: "lo"}
+
+
+  # t1, t2  Lower, Upper  time bounds for which data is requested.
+  # inc     One of: "lo", "hi".
+  request_data: (parms) -> $.get 'groupupdate', parms
+
+
+  # Newly-arrived content has been inserted into the document.
+  # Adjust it for display:
+  complete_data_request: ->
+    [ @tlo, @new_tlo ] = [ @new_tlo, null ] if @new_tlo
+    [ @thi, @new_thi ] = [ @new_thi, null ] if @new_thi
+    @slide_time 0
+
+
+  time_update_view: ->
+    for ts in @timespans
+      ts.time_update_row_view( @t0, @tn )
+
+
+  oldness: -> (new Date).valueOf() / 1000 - @t0
+  update_check: ->
+    return if @debug
+    age = @oldness()          # Too old: assume user manually moved view back
+    @slide_time @fifteen_min if age >= @ten_min  &&  age <  2 * @ten_min
+
+# end class ResourceSchedule
+# ------------------------------------------------------------------------
+
+class ResourceUseTimeSpan
+
+  constructor: (grid, ts, vis_width, t0, tn) ->
+    $(ts).prev().children('img').fadeTo(0, 0.45)# IE won't do this w/ CSS
+
+    @grid = grid
+    @spanwidth = vis_width
+    @t0 = t0
+    @tn = tn
+
+    $(ts).append('<div class="block0 blockdiv"></div>' +
+                 '<div class="blockn blockdiv"></div>')
+    children = $(ts).children().get()
+    @blockn = children.pop()
+    @block0 = children.pop()
+
+    @vis_blocks = []   # Maintained by adjust_visible_time_bounds()
+                       # Redundant for now.
+
+  canonize: (b) ->
+    return false unless b
+    return true if 'starttime' in b
+
+    if b.hasAttribute('starttime') && b.hasAttribute('endtime')
+      b.starttime = parseInt b.getAttribute('starttime')
+      b.endtime   = parseInt b.getAttribute('endtime')
+      return true
+
+    false
+
+
+  # Bubble block0/blockn markers to before/after the visible
+  # elements in time range [t0..tn] and bless them.
+  adjust_visible_time_bounds: (t0, tn) ->
+    b0 = @block0
+    bn = @blockn
+
+    while (n = bn.nextElementSibling)  &&  @canonize(n)  &&  n.starttime < tn
+      $(n).insertBefore($(bn)).show()     # extend_up_thru
+      @vis_blocks.push(bn);
+
+    while (n = b0.previousElementSibling)  &&  @canonize(n)  &&  n.endtime > t0
+      $(n).insertAfter($(b0)).show()      # extend_down_thru
+      @vis_blocks.unshift(n);
+
+    while (n = b0.nextElementSibling)  &&  n.endtime <= t0
+      $(n).insertBefore($(b0)).hide()     # retract_up
+      @vis_blocks.shift()
+
+    while (n = bn.previousElementSibling)  &&  n.starttime >= tn
+      $(n).insertAfter($(bn)).hide()      # retract_down
+      @vis_blocks.pop()
+
+
+  time_update_row_view: (t0, tn) ->
+    [ @t0, @tn ]               = [ t0, tn ]
+    @adjust_visible_time_bounds    t0, tn
+    @set_places_and_widths_by_time t0, tn
+
+  set_places_and_widths_by_time: (tMIN, tMAX) ->
+    timToPixScale =  @spanwidth / (tMAX - tMIN)
+    [ blk, end ] = [ @block0, @blockn ]
+
+    while (blk = $(blk).next().get(0)) != end
+      vts = Math.max  blk.starttime, tMIN
+      vte = Math.min  blk.endtime,   tMAX
+
+      pixLeft  = Math.floor( (vts - tMIN) * timToPixScale )
+      pixRight = Math.floor( (vte - tMIN) * timToPixScale ) # Quantizing
+      pixWidth = pixRight - pixLeft # Fails to make uniform gaps in Chrome.
+
+      blk = $(blk)
+      blk.css( 'left', pixLeft + "px")
+      blk.css( 'width', pixWidth - 2 + "px" )
+      blk.children('.blockclip').width( Math.max(pixWidth-6,2) + "px" )
+
+# end class ResourceUseTimeSpan
+
+
+window.after_update = ->
+  sched = $('#multi_sched_view')
+
+  window.grid ||= new ResourceSchedule( sched )
+
+  sched.sortable({ axis: 'y', handle: '.rsrclabel', revert: true })
+
+  window.grid.complete_data_request()
+
+  setInterval (-> window.grid.update_check()), 30000
+
+
+$( -> window.after_update() )
+
+# window.prt_vis_divs = ->
+#   divs = $("#timespanTimeheaderhour_hour0").children(".timeblock")
+#   ds = '   '
+#   dl = '   '
+#   lastDiv = null
+#   for div in divs when div.style.display != "none"
+#     t = div.textContent.trim()
+#     w = div.style.width
+#     if lastDiv
+#       dl = parseInt(div.style.left) - parseInt(lastDiv.style.left)
+#       ds = div.starttime - lastDiv.starttime
+#     l = div.style.left
+
+#     console.log "#{t} #{w} #{ds} #{dl} #{l}"
+#     lastDiv = div
+#   null
