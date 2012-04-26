@@ -59,7 +59,7 @@ class SchedResource
   #   Key is a Resource (rsrc);
   #   Value is an array of use-block instances.
   # 
-  def self.get_all_blocks(t1, t2, inc, logger)
+  def self.get_all_blocks(t1, t2, inc)
     blockss = {}
 
     @@config[:rsrcs_by_kind].each{ |kind, rsrcs|
@@ -117,7 +117,7 @@ class SchedResource
     klass = eval klass if klass.class == String
     rsrc  = getFor( klass.name, rid )
     begin
-      klass.send(:find_as_schedule_resource, rid ).decorateResource rsrc
+      klass.find_as_schedule_resource( rid ).decorateResource rsrc
     rescue Exception => e
       puts "\nSchedResource.makeResourceOfKind Exception: #{e}"
       e.backtrace.each{|l| puts l }
@@ -135,25 +135,16 @@ class SchedResource
   # state here.  But if there <em>were</em> such state it would likely be
   # kept, eg, in a per-user table in the database.
   #
-  def self.ensureConfig( session, logger )
-    return if @@config
+  def self.ensureConfig( session )
+    return if (@@config ||= session[:scheduleConfig])
 
-    @@config = session[:scheduleConfig] # ELABORATE for >1 grid/session XXXX
-    
-    if @@config
-      # logger.info "\nConfig from session.\n#{@@config.inspect}"
-      return
-    end
-
-    SchedResource.configFromYaml( session, logger )
+    SchedResource.configFromYaml( session )
   end
 
 
   # Process configuration file.
   #
-  def self.configFromYaml( session, logger )
-    logger.info "\nConfig from YAML."
-
+  def self.configFromYaml( session )
     @@config = {}
     @@config[:all_resources] = []
     @@config[:rsrc_of_tag]   = {}
@@ -163,15 +154,14 @@ class SchedResource
 
     yml = YAML.load_file("config/schedule.yml")
 
-    if (rks = yml['ResourceKinds'])       # "Channel"==><#Class Program>
-      rks.each {| key, val|               # "Timeheader" ==><#Class Timelabel>
+    if (rks = yml['ResourceKinds'])     # { "Channel" => <#Class Program>... }
+      rks.each { |key, val|
         @@config[:blockClassForResourceKind][key] = eval val}
     end
     
-    if (rkls = yml['Resources'])          # Resource Kind Lists, eg
-      rkls.each{ |rkl|                    # ["Timeheader", "Hour0"]
-        # rkl = rkls.shift
-        rkl = rkl.split(/[, ]+/)          # ["Channel",    "702", "703",... ]
+    if (rkls = yml['Resources'])        # Resource Kind Lists, eg
+      rkls.each{ |rkl|                  # ["Timeheaderhour", "Hour0"]
+        rkl = rkl.split(/[, ]+/)        # ["Channel",    "702", "703",... ]
         rk = rkl.shift
         
         rkl.each{| subId |

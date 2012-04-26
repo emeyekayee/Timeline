@@ -20,20 +20,12 @@ class Channel < ActiveRecord::Base
 
   # Return Channel object from channum (String)
   def self.find_as_schedule_resource (rid)
-    @@channel_by_num[rid] # rid is channid
+    @@channel_by_num[rid] # rid is channum
   end
 
   def decorateResource( rsrc )
     rsrc.label = self.channum
-    begin
-      rsrc.title = self.name
-    rescue Exception => e
-      puts "\nChannel.decorateResource() Exception: #{e}"
-      # puts "attrs = #{attrs.inspect}\n"
-      require 'ripl'
-      Ripl.start :binding => binding
-    end
-
+    rsrc.title = self.name
   end
 
 end

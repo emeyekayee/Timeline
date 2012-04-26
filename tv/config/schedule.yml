@@ -14,8 +14,8 @@ Resources:
    - Timeheaderhour       hour0
    - Channel              60  189 190 204
    - Timeheaderhour       hour1
-   - Channel              37 737 42 738 756 757 49 798
-   # - Channel       
+   - Channel              37 737 42 738 756 757 49
+   # - Channel              798
    #                    738
 
 

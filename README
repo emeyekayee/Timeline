@@ -1,9 +1,9 @@
 
 
 Timeline is a schedule widget built for Rails that uses Javascript/
-prototype.js/AJAX to display how resources are used over time.  The
-basic building-block is a DOM div (a resource row) containing a
-label and a timespan:
+jQuery/AJAX to display how some set of resources are used over time.
+The building-block is a schedule for a single resource, which is a DOM
+div (a resource row) containing a label and a timespan:
 
                 +-------+----------------------+
                 | label |       timespan       |
@@ -31,5 +31,5 @@ simply the text "Hour" and whose blocks are time segments with text: "9:30",
 Time blocks of all resources are clipped to the visible part of the
 schedule.  This means you can also create toolbars or headers that
 _appear_ not to scroll with time -- just make a resource with a single
-time block that has a very small (large) starttime (endtime).
+time block that has a very small starttime and large endtime.
 
