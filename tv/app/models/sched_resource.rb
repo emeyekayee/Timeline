@@ -115,17 +115,7 @@ class SchedResource
 
   def self.makeResourceOfKind( klass, rid )
     klass = eval klass if klass.class == String
-    rsrc  = getFor( klass.name, rid )
-    begin
-      klass.find_as_schedule_resource( rid ).decorateResource rsrc
-    rescue Exception => e
-      puts "\nSchedResource.makeResourceOfKind Exception: #{e}"
-      e.backtrace.each{|l| puts l }
-      require 'ripl'
-      Ripl.start :binding => binding
-    end
-    
-    rsrc
+    getFor( klass.name, rid )
   end
 
 
@@ -143,37 +133,46 @@ class SchedResource
 
 
   # Process configuration file.
-  #
   def self.configFromYaml( session )
-    @@config = {}
-    @@config[:all_resources] = []
+    configFromYaml1
+    configFromYaml2 session 
+    @@config
+  end
+    
+
+  def self.configFromYaml1()
+    @@config = { visibleTime: nil, rsrcs_by_kind: nil, all_resources: [] }
     @@config[:rsrc_of_tag]   = {}
     @@config[:blockClassForResourceKind] = {} 
-    @@config[:visibleTime]   = nil
-    @@config[:rsrcs_by_kind] = nil
 
     yml = YAML.load_file("config/schedule.yml")
 
-    if (rks = yml['ResourceKinds'])     # { "Channel" => <#Class Program>... }
-      rks.each { |key, val|
-        @@config[:blockClassForResourceKind][key] = eval val}
-    end
-    
+    yml['ResourceKinds'].each{ |key, val|  # {"Channel" => <#Class Program>... }
+      @@config[:blockClassForResourceKind][key] = eval val
+    }
+
     if (rkls = yml['Resources'])        # Resource Kind Lists, eg
       rkls.each{ |rkl|                  # ["Timeheaderhour", "Hour0"]
         rkl = rkl.split(/[, ]+/)        # ["Channel",    "702", "703",... ]
-        rk = rkl.shift
-        
-        rkl.each{| subId |
-          @@config[:all_resources].push( makeResourceOfKind(rk, subId) )
-        }
+        rk  = rkl.shift
+        @@config[:all_resources] += rkl.map{|subId| makeResourceOfKind(rk, subId) }
       }
     end
 
     @@config[:visibleTime] = (vt = yml['visibleTime']) ? (eval vt) : 3.hours
+    @@config
+  end
 
-    # MUST BE REBUILT if resourceList changes (in content, not order)
+
+  def self.configFromYaml2( session )
     @@config[:rsrcs_by_kind] = resourceList.group_by{ |r| r.kind }
+
+    @@config[:rsrcs_by_kind].each do |kind, rsrcs|
+      klass = eval kind
+      rsrcs.each { |rsrc|
+        klass.find_as_schedule_resource(rsrc.subId).decorateResource rsrc
+      }
+    end
 
     session[:scheduleConfig] = @@config
   end

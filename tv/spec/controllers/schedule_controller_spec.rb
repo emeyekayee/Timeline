@@ -16,33 +16,45 @@ describe ScheduleController do
   end
 
 
-  describe "GET 'test'" do
-    it "passes configuration sanity test" do
-      get 'test'
+  describe "Validate resource specifications" do
+    it "Has only valid resource specs." do
 
-      config = SchedResource.config
+      rsrcs = SchedResource.configFromYaml1[:all_resources]            
+      rsrcs.all?.should == true
+
+    end
+  end
+
+
+  describe "Validate configuration consistency." do
+    it "Shows a consistent set of resource classes.." do
+
+      config = SchedResource.configFromYaml({})
       
       kinds1 = config[:blockClassForResourceKind].keys
       kinds2 = config[:rsrcs_by_kind].keys
 
-      # assert (kinds1 - kinds2) == []
       (kinds1 - kinds2).should == []
       (kinds2 - kinds1).should == []
       
       kinds = kinds1
-      # assert( kinds.length > 0 )
-      kinds.length.should be > 0
+      kinds1.length.should be > 0
 
       kinds.each{ |kind| 
-        # assert( config[:rsrcs_by_kind][kind].length > 0,
-        #         "There should be at least one resource of kind #{kind}" )
         config[:rsrcs_by_kind][kind].length.should be > 0
 
         klass = config[:blockClassForResourceKind][kind].class
 
-        # assert( klass == Class, "No class found for use blocks of #{kind}." )
         klass.should == Class
       }
+
+    end
+  end
+
+
+  describe "GET 'test'" do
+    it "passes configuration sanity test" do
+      get 'test'
 
       response.should be_success
     end
