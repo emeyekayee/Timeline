@@ -12,7 +12,7 @@ window.InfoPopup = {
 
   display: (evt, tt) ->
     if evt.type == 'mouseover'
-      tt.show()
+      tt.fadeIn() # tt.show()
       [pX, pY] = [evt.pageX, evt.pageY]
 
       if pX <  innerWidth / 2 then xoff = pX + @smidge
@@ -22,5 +22,5 @@ window.InfoPopup = {
 
       @place(tt, xoff, yoff)
     else
-      tt.hide()
+      tt.fadeOut() # tt.hide()
 }
