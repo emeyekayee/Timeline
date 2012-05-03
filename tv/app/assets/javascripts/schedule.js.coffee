@@ -9,15 +9,15 @@ class ResourceSchedule
   constructor: (@schedElt) ->
     @tss = $(".timespan", @schedElt)
 
-    wide = document.body.clientWidth - 4
-    @spanwidth = wide - @tss[0].offsetLeft - 2
-    @schedElt.width wide+"px"
+    w = document.body.clientWidth
+    @spanwidth = w - @tss[0].offsetLeft
+    @schedElt.width w - 4 + "px"
 
     @init_time_bounds()
     @init_timespans()
 
-    @schedElt.delegate ".blockdiv a", "mouseover", InfoPopup.mouseOverOutHand
-    @schedElt.delegate ".blockdiv a", "mouseout",  InfoPopup.mouseOverOutHand
+    for e in [ 'mouseover', 'mouseout' ]
+      @schedElt.delegate '.blockdiv a', e, InfoPopup.mouseOverOutHand
 
 
   init_time_bounds: ->
@@ -31,7 +31,7 @@ class ResourceSchedule
 
   init_timespans: ->
     @timespans =
-      (new ResourceUseTimeSpan(this,ts,@spanwidth,@t0,@tn) for ts in @tss)
+      (new ResourceUseTimeSpan(this, $(ts), @spanwidth, @t0,@tn) for ts in @tss)
 
 
   slide_time: (delta) ->
@@ -80,22 +80,16 @@ class ResourceSchedule
 
 class ResourceUseTimeSpan
 
-  constructor: (grid, ts, vis_width, t0, tn) ->
-    $(ts).prev().children('img').fadeTo(0, 0.45)# IE won't do this w/ CSS
+  constructor: (@grid, ts, @spanwidth, @t0, @tn) ->
+    ts.prev().children('img').fadeTo(0, 0.45) # IE won't do this w/ CSS
 
-    @grid = grid
-    @spanwidth = vis_width
-    @t0 = t0
-    @tn = tn
-
-    $(ts).append('<div class="block0 blockdiv"></div>' +
+    ts.append('<div class="block0 blockdiv"></div>' +
                  '<div class="blockn blockdiv"></div>')
-    children = $(ts).children().get()
-    @blockn = children.pop()
-    @block0 = children.pop()
+    children = ts.children().get()
+    [ @blockn, @block0 ] = [ children.pop(), children.pop() ]
 
-    @vis_blocks = []   # Maintained by adjust_visible_time_bounds()
-                       # Redundant for now.
+    @vis_blocks = [] # Managed by adjust_visible_time_bounds(); Redundant now
+
 
   canonize: (b) ->
     return false unless b
@@ -138,7 +132,7 @@ class ResourceUseTimeSpan
     @set_places_and_widths_by_time t0, tn
 
   set_places_and_widths_by_time: (tMIN, tMAX) ->
-    timToPixScale =  (@spanwidth + 12) / (tMAX - tMIN) # Fudge factor
+    timToPixScale =  (@spanwidth + 6) / (tMAX - tMIN) # Fudge factor
     [ blk, end ] = [ @block0, @blockn ]
 
     while (blk = $(blk).next().get(0)) != end
