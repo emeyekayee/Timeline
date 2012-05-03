@@ -138,7 +138,7 @@ class ResourceUseTimeSpan
     @set_places_and_widths_by_time t0, tn
 
   set_places_and_widths_by_time: (tMIN, tMAX) ->
-    timToPixScale =  @spanwidth / (tMAX - tMIN)
+    timToPixScale =  (@spanwidth + 12) / (tMAX - tMIN) # Fudge factor
     [ blk, end ] = [ @block0, @blockn ]
 
     while (blk = $(blk).next().get(0)) != end

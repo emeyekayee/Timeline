@@ -118,7 +118,7 @@ a:visited             { color: white; text-decoration: none;}
                       }
 
 .timespan             { position:         absolute;
-                        left:             58px; 
+                        left:             68px; 
                       }
 
 
@@ -139,7 +139,7 @@ a:visited             { color: white; text-decoration: none;}
                         overflow:         hidden; 
                       }
 
-.multisched           { position:         absolute;  /*  */
+.multisched           { /* position:         absolute;   */
                         left:             10px;
                         border:           2px solid #336680;
                         padding-bottom:   4px;
