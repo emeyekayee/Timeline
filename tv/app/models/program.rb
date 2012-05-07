@@ -50,27 +50,25 @@ class Program < ActiveRecord::Base
     blks.group_by { |pgm| pgm.channel.channum }
   end
 
-  # Slightly faster, as program blocks are already ordered:
-  #      ...
-  #      blockss = {}
-  #      Program.programs_by_channel( blks ) do |pgms|
-  #        blockss[ pgms[0].chanid ] = pgms
-  #      end 
-  #      return blockss
+  # Perhaps a bit faster, as program blocks are already ordered:
+  #     ...
+  #     blockss = {}
+  #     Program.programs_by_channel( blks ) do |pgms|
+  #       blockss[ pgms[0].chanid ] = pgms
+  #     end 
+  #     return blockss
   #
-  #    # Group adjacent programs with same chanid and yield them.
-  #    def Program.programs_by_channel( programs )
-  #      until programs.empty? do
-  #        v0 = programs[0].chanid
-  #        bof = []
-  #        
-  #        until programs.empty? || v0 != programs[0].chanid do
-  #          bof.push programs.shift
-  #        end
-  #        
-  #        yield bof
-  #      end
-  #    end
+  #   # Group adjacent programs with same chanid and yield them.
+  #   def Program.programs_by_channel( programs )
+  #     until programs.empty? do
+  #       v0 = programs[0].chanid
+  #       i = 1; len = programs.length
+  #       
+  #       i += 1 while i < len && v0 == programs[i]
+  #       
+  #       yield programs.slice!( 0...i )
+  #     end
+  #   end
   #
 
 
@@ -95,8 +93,7 @@ class Program < ActiveRecord::Base
   end
 
 
-
-protected
+  protected
 
   def to_css_class ( cat )
     clss = @@css_translation_cache[ cat ]
@@ -116,7 +113,6 @@ protected
 
   
   @@css_translation_cache = {}
-
 
 #  @@Categories is a hash of keys
 #  corresponding to the css style used for each show category.  Each
@@ -148,7 +144,7 @@ protected
     'Reality'        =>  ['Reality',          /\b(reality)/i],
     'Romance'        =>  ['Romance',          /\b(romance)/i],
     'SciFi_Fantasy'  =>  ['SciFi / Fantasy',  /\b(fantasy|sci\\w*\\W*fi)/i],
-    'Science_Nature'=> ['Science / Nature',/\b(science|nature|environment)/i],
+    'Science_Nature' =>  ['Science / Nature', /\b(science|nature|environm)/i],
     'Shopping'       =>  ['Shopping',         /\b(shop)/i],
     'Soaps'          =>  ['Soaps',            /\b(soaps)/i],
     'Spiritual'      =>  ['Spiritual',        /\b(spirit|relig)/i],
