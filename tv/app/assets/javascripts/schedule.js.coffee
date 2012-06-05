@@ -132,15 +132,15 @@ class ResourceUseTimeSpan
     @set_places_and_widths_by_time t0, tn
 
   set_places_and_widths_by_time: (tMIN, tMAX) ->
-    timToPixScale =  (@spanwidth + 6) / (tMAX - tMIN) # Fudge factor
+    timeToPixScale =  (@spanwidth + 6) / (tMAX - tMIN) # Fudge factor
     [ blk, end ] = [ @block0, @blockn ]
 
     while (blk = $(blk).next().get(0)) != end
       vts = Math.max  blk.starttime, tMIN
       vte = Math.min  blk.endtime,   tMAX
 
-      pixLeft  = Math.floor( (vts - tMIN) * timToPixScale )
-      pixRight = Math.floor( (vte - tMIN) * timToPixScale ) # Quantizing
+      pixLeft  = Math.floor( (vts - tMIN) * timeToPixScale )
+      pixRight = Math.floor( (vte - tMIN) * timeToPixScale ) # Quantizing
       pixWidth = pixRight - pixLeft # Fails to make uniform gaps in Chrome.
 
       blk = $(blk)
@@ -152,7 +152,7 @@ class ResourceUseTimeSpan
 
 
 window.after_update = ->
-  sched = $('#multi_sched_view')
+  sched = $('#multi_sched_view'); return unless sched.length > 0
 
   window.grid ||= new ResourceSchedule( sched )
 
@@ -164,20 +164,3 @@ window.after_update = ->
 
 
 $( -> window.after_update() )
-
-# window.prt_vis_divs = ->
-#   divs = $("#timespanTimeheaderhour_hour0").children(".timeblock")
-#   ds = '   '
-#   dl = '   '
-#   lastDiv = null
-#   for div in divs when div.style.display != "none"
-#     t = div.textContent.trim()
-#     w = div.style.width
-#     if lastDiv
-#       dl = parseInt(div.style.left) - parseInt(lastDiv.style.left)
-#       ds = div.starttime - lastDiv.starttime
-#     l = div.style.left
-
-#     console.log "#{t} #{w} #{ds} #{dl} #{l}"
-#     lastDiv = div
-#   null

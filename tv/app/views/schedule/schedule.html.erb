@@ -1,6 +1,5 @@
 
 <center>
-
   <%= link_to_function("<<<", 
                        "window.grid.slide_time(-#{180.minutes})") %>
     &nbsp;&nbsp;&nbsp;
@@ -19,32 +18,26 @@
   <%= link_to_function(">>>", 
                        "window.grid.slide_time(#{180.minutes})") %>
     <br/>
-
-    </center>
+</center>
 
     <div id="multi_sched_view" class="multisched"
-         <%= "starttime='#{@t1.to_i}' 
-                endtime='#{@t2.to_i}'"%> >
+         <%= "starttime='#{@t1.to_i}' endtime='#{@t2.to_i}'"%> >
  
  <% @rsrcs.each do |rsrc|  
       label = rsrc.label() || '';
       title = rsrc.title() || '';  %>
 
-      <div id="Row_<%= rsrc %>" class="<%= rsrc.css_classes_for_row() %>">
-
+      <div id="Row_<%= rsrc %>" class="<%= rsrc.css_classes_for_row() -%>">
         <div class="rsrclabel">
           <div><%= label %></div>
           <img src="/assets/<%= label %>.jpg" title="<%= title %>" />
         </div>
 
         <div id='timespan<%= rsrc %>' class="timespan" >
-              
           <%= render(:partial=>'spancontent',
                      :object=>(@blockss[rsrc] || [] )) %>
         </div>
       </div>
-
  <% end %>
-
 </div>
 

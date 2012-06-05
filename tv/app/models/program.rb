@@ -15,6 +15,7 @@ class Program < ActiveRecord::Base
     chanid title subtitle description starttime endtime 
     category category_type stars airdate previouslyshown).join(', ')
   
+
   # Returns a hash where each key is a <tt>SchedResource</tt> object
   # corresponding to a resource id and the value is an array of
   # blocks in the interval <tt>t1...t2</tt>, ordered by
@@ -42,10 +43,8 @@ class Program < ActiveRecord::Base
               t1.to_i,
               t2.to_i ]
 
-    opts = { :select => @@program_attrs, :conditions => conds, 
-             :order => "chanid MOD 1000, starttime"}
-    
-    blks = Program.all(opts).each{ |pgm| pgm.set_visual_info }
+    rel1 = select(@@program_attrs).order("chanid MOD 1000, starttime")
+    blks = rel1.where(conds).each{ |pgm| pgm.set_visual_info }
 
     blks.group_by { |pgm| pgm.channel.channum }
   end
@@ -181,7 +180,3 @@ class Program < ActiveRecord::Base
   alias_method_chain(:starttime, :local_tz)
   alias_method_chain(  :endtime, :local_tz)
 end
-
-
-
-

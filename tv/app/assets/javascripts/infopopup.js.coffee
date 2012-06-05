@@ -1,4 +1,4 @@
-window.InfoPopup = {
+window.InfoPopup =
   smidge: 5
 
   mouseOverOutHand: (evt) ->
@@ -22,5 +22,4 @@ window.InfoPopup = {
 
       @place(tt, xoff, yoff)
     else
-      tt.fadeOut() # tt.hide()
-}
+      tt.fadeOut('100') # tt.hide()

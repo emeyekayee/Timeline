@@ -1,18 +1,16 @@
-<!-- _spancontent.html.erb                                 -->
-<!-- Copyright (c) 2006-2012 Mike Cannon                   -->
-<!--               (http://github.com/emeyekayee/Timeline) -->
-<!--               (michael.j.cannon@gmail.com)            -->
-
+<% # _spancontent.html.erb                                  %>
+<% # Copyright (c) 2006-2012 Mike Cannon                    %>
+<% #               (http://github.com/emeyekayee/Timeline)  %>
+<% #               (michael.j.cannon@gmail.com)             %>
 <% for block in spancontent %>
-      
-  <div class="blockdiv <%= block.css_classes %>" valign="top"
-       style="display: none;"
-       <%= "starttime='#{block.starttime.to_i}' 
-            endtime='#{block.endtime.to_i}'"%> >
-    <div class="blockclip">  
-      <a href="#" ><%= block.block_label %></a>                   
-    </div>
-    <%= render(:partial => 'block_internal', :object  => block) %>
-  </div>
 
-<% end%>
+    <div class="blockdiv <%= block.css_classes %>" valign="top"
+         style="display: none;"
+         <%= "starttime='#{block.starttime.to_i}' 
+              endtime='#{block.endtime.to_i}'"%> >
+      <div class="blockclip">  
+        <a href="#" ><%= block.block_label %></a>
+      </div>
+      <%= render(:partial => 'block_internal', :object  => block) -%>
+    </div>
+<%- end -%>
