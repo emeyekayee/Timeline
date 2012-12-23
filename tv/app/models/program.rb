@@ -21,7 +21,7 @@ class Program < ActiveRecord::Base
   # blocks in the interval <tt>t1...t2</tt>, ordered by
   # <tt>starttime</tt>.
   #
-  # What <em>in</em> mean depends on *inc*.  If inc(remental) is 
+  # What <em>in</em> means depends on *inc*.  If inc(remental) is 
   # false, client is building interval from scratch.  If "hi", 
   # it is an addition to an existing interval on the high side.
   #
@@ -48,28 +48,6 @@ class Program < ActiveRecord::Base
 
     blks.group_by { |pgm| pgm.channel.channum }
   end
-
-  # Perhaps a bit faster, as program blocks are already ordered:
-  #     ...
-  #     blockss = {}
-  #     Program.programs_by_channel( blks ) do |pgms|
-  #       blockss[ pgms[0].chanid ] = pgms
-  #     end 
-  #     return blockss
-  #
-  #   # Group adjacent programs with same chanid and yield them.
-  #   def Program.programs_by_channel( programs )
-  #     until programs.empty? do
-  #       v0 = programs[0].chanid
-  #       i = 1; len = programs.length
-  #       
-  #       i += 1 while i < len && v0 == programs[i]
-  #       
-  #       yield programs.slice!( 0...i )
-  #     end
-  #   end
-  #
-
 
   # Figure css classes for program block display using...
   #   - prog.category_type (eg, "series", ...)
