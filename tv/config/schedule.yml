@@ -4,13 +4,13 @@
 ResourceKinds:
 # Resource:             Resource Use
   Channel:              Program
-  TimeheaderdayNight:   TimelabeldayNight
+  TimeheaderDayNight:   TimelabeldayNight
   Timeheaderhour:       Timelabelhour
 
 visibleTime: 3.hours
        
 Resources:
-   - TimeheaderdayNight   dayNight0
+   - TimeheaderDayNight   dayNight0
    - Timeheaderhour       hour0
    - Channel              60  189 190 204
    - Timeheaderhour       hour1

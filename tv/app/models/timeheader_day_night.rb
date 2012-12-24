@@ -1,0 +1,3 @@
+class TimeheaderDayNight < Timeheader
+end
+

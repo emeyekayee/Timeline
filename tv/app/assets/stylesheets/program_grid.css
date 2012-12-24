@@ -77,12 +77,12 @@ a:visited             { color: white; text-decoration: none;}
 /* .Timeheaderrow */
                     
 .Timeheaderhourrow      { height:    22px;}
-.TimeheaderdayNightrow  { height:    22px;}
+.TimeheaderDayNightrow  { height:    22px;}
                                            
 .Timeheaderhourrow     .blockdiv  { height:   22px;}
-.TimeheaderdayNightrow .blockdiv  { height:   22px;}
+.TimeheaderDayNightrow .blockdiv  { height:   22px;}
 
-.TimeheaderdayNightrow  .rsrclabel img 
+.TimeheaderDayNightrow  .rsrclabel img 
                       {                        /* "inherit" no go for IE  */
                         height:           22px;
                         width:            56px;
@@ -95,7 +95,7 @@ a:visited             { color: white; text-decoration: none;}
                       }
 
 
-.TimeheaderdayNightrow div.rsrclabel
+.TimeheaderDayNightrow div.rsrclabel
                       {
                         color:            #D0E0F0;
                         height:           22px;
