@@ -10,27 +10,27 @@ class ScheduleController < ApplicationController
   end
 
   def test
-    SchedResource.configFromYaml session
+    SchedResource.config_from_yaml session
     @text = ""
     config = SchedResource.config
     config.keys.each{|key| @text << "\n#{key}:\n" + config[key].inspect}
   end
 
   def schedule
-    SchedResource.send( params[:reset] ? :configFromYaml : :ensureConfig,
+    SchedResource.send( params[:reset] ? :config_from_yaml : :ensure_config,
                         session )
                         
     tNow = (Time.now + 5.minutes)
     tNow = tNow.change( :min => (tNow.min/15) * 15 )
     @t1 = params[:t1] || tNow
-    @t2 = params[:t2] || @t1 + SchedResource.visibleTime
+    @t2 = params[:t2] || @t1 + SchedResource.visible_time
     @inc= params[:inc]
 
     get_data_for_time_span
   end
 
   def groupupdate
-    SchedResource.ensureConfig session
+    SchedResource.ensure_config session
 
     @t1 = params[:t1]
     @t2 = params[:t2]
@@ -53,7 +53,7 @@ class ScheduleController < ApplicationController
     @t1 = Time.at(@t1.to_i)
     @t2 = Time.at(@t2.to_i)
 
-    @rsrcs = SchedResource.resourceList
+    @rsrcs = SchedResource.resource_list
 
     @blockss = SchedResource.get_all_blocks(@t1, @t2, @inc)
   end

@@ -23,7 +23,7 @@ class Channel < ActiveRecord::Base
     @@channel_by_num[rid] # rid is channum
   end
 
-  def decorateResource( rsrc )
+  def decorate_resource( rsrc )
     rsrc.label = self.channum
     rsrc.title = self.name
   end

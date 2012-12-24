@@ -16,11 +16,11 @@ class Timeheader
 
   # For SchedResource
   # Return Timeheader* object from resource id (string)
-  def self.find_as_schedule_resource(rid)
+  def self.find_as_schedule_resource( rid )
     @@header_by_rid[rid] || (@@header_by_rid[rid] = new(rid))
   end
 
-  def decorateResource( rsrc )
+  def decorate_resource( rsrc )
     klass = SchedResource.block_class_for_resource_name(self.class.name)
     rsrc.label = klass.label
     rsrc.title = @rid

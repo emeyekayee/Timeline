@@ -45,9 +45,9 @@ class SchedResource
   # config is loaded from config/schedule.yml.
   #  all_resources               Resources in display order
   #  rsrcs_by_kind               Resources (above) grouped by kind (a hash)
-  #  rsrc_of_tag                 Indexed by text tag: kind_subId
-  #  visibleTime                 Span of time window.
-  #  blockClassForResourceKind
+  #  rsrc_of_tag                 Indexed by text tag: kind_sub_id
+  #  visible_time                Span of time window.
+  #  block_class_for_resource_kind
   #
   # When queried with an array of ids and a time interval, the class
   # method <tt>get_all_blocks(ids, t1, t2)</tt> of a <em>resource use</em>
@@ -63,20 +63,20 @@ class SchedResource
     blockss = {}
 
     config[:rsrcs_by_kind].each do |kind, rsrcs|
-      rubClass = block_class_for_resource_name kind
-      rids     = rsrcs.map{ |r| r.subId }
-      ruBlkss  = rubClass.get_all_blocks rids, t1, t2, inc
+      rub_class = block_class_for_resource_name kind
+      rids      = rsrcs.map{ |r| r.sub_id }
+      ru_blkss  = rub_class.get_all_blocks rids, t1, t2, inc
 
-      add_rubs_of_kind kind, ruBlkss, blockss
+      add_rubs_of_kind kind, ru_blkss, blockss
     end
 
     blockss
   end
 
 
-  def self.add_rubs_of_kind( kind, ruBlkss, blockss )
-    ruBlkss.each do |rid, blks|
-      rsrc = getFor( kind, rid )
+  def self.add_rubs_of_kind( kind, ru_blkss, blockss )
+    ru_blkss.each do |rid, blks|
+      rsrc = get_for( kind, rid )
       rubs = blks.map{ |blk| ResourceUseBlock.new rsrc, blk }
       blockss[ rsrc ] = rubs
     end
@@ -84,32 +84,100 @@ class SchedResource
 
 
   def self.block_class_for_resource_name( name )
-    config[:blockClassForResourceKind][name]
+    config[:block_class_for_resource_kind][name]
   end
 
 
   # A caching one-of-each-sort constructor.
   # - kind: string (a class name)
-  # - subId: string id, selecting a resource instance
+  # - sub_id: string id, selecting a resource instance
   # The two are combined and used as a unique tag -- as a
   #  - DOM id/class on the client and
   #  - In server code.
   #
-  def self.getFor( kind, subId )
-    tag = composeTag( kind, subId )
-    config[:rsrc_of_tag][ tag ] || self.new( kind, subId )
+  def self.get_for( kind, sub_id )
+    tag = compose_tag( kind, sub_id )
+    config[:rsrc_of_tag][ tag ] || self.new( kind, sub_id )
   end
 
-  def self.resourceList; config[:all_resources] end
+  def self.resource_list; config[:all_resources] end
 
-  def self.visibleTime;  config[:visibleTime] end
+  def self.visible_time;  config[:visible_time] end
+
+
+  # Restore configuration from session.
+  #
+  # OK, Ok, this would not be RESTful if we were actually maintaining any
+  # state here.  But if there <em>were</em> such state it would likely be
+  # kept, eg, in a per-user table in the database.
+  #
+  def self.ensure_config( session )
+    return if (config ||= session[:schedule_config])
+
+    SchedResource.config_from_yaml( session )
+  end
+
+
+  # Process configuration file.
+  def self.config_from_yaml( session )
+    config_from_yaml1
+    config_from_yaml2 session
+    config
+  end
+
+
+  def self.config_from_yaml1()
+    self.config = { all_resources: [],
+                    rsrc_of_tag: {}, 
+                    block_class_for_resource_kind: {}
+                   }
+    yml = YAML.load_file("config/schedule.yml")
+
+    yml['ResourceKinds'].each do |key, val|  # {"Channel" => <#Class Program>...}
+      config[:block_class_for_resource_kind][key] = eval val
+    end
+
+    if (rkls = yml['Resources'])        # Resource Kind Lists, eg
+      rkls.each do |rkl|                # ["Timeheaderhour", "Hour0"]
+        rkl = rkl.split(/[, ]+/)        # ["Channel",    "702", "703",... ]
+        rk  = rkl.shift
+        config[:all_resources] += rkl.map{|sub_id| make_resource_of_kind(rk, sub_id)}
+      end
+    end
+
+    config[:visible_time] = (vt = yml['visibleTime']) ? (eval vt) : 3.hours
+    config
+  end
+
+
+  def self.config_from_yaml2( session )
+    config[:rsrcs_by_kind] = resource_list.group_by{ |r| r.kind }
+
+    config[:rsrcs_by_kind].each do |kind, rsrcs|
+      klass = eval kind
+      rsrcs.each do |rsrc|
+        klass.find_as_schedule_resource(rsrc.sub_id).decorate_resource rsrc
+      end
+    end
+
+    session[:schedule_config] = config
+  end
+
+
+  def self.compose_tag( kind, sub_id ); "#{kind}_#{sub_id}" end
 
 
 
   # Instance methods
 
+  def initialize( kind, sub_id )
+    @tag = self.class.compose_tag( kind, sub_id )
+    @label = @title = nil
+    config[:rsrc_of_tag][@tag] = self
+  end
+
   def kind()    @tag.sub( /_.*/, '' )          end
-  def subId()   @tag.sub( /.*_/, '' )          end
+  def sub_id()  @tag.sub( /.*_/, '' )          end
   def to_s()    @tag                           end
   def inspect() "<#SchedResource \"#{@tag}\">" end
 
@@ -119,79 +187,9 @@ class SchedResource
 
   def css_classes_for_row(); "rsrcRow #{self.kind}row #{@tag}row" end
 
-  def self.makeResourceOfKind( klass, rid )
+  def self.make_resource_of_kind( klass, rid )
     klass = eval klass if klass.class == String
-    getFor( klass.name, rid )
-  end
-
-
-  # Restore configuration from session.
-  #
-  # OK, Ok, this would not be RESTful if we were actually maintaining any
-  # state here.  But if there <em>were</em> such state it would likely be
-  # kept, eg, in a per-user table in the database.
-  #
-  def self.ensureConfig( session )
-    return if (config ||= session[:scheduleConfig])
-
-    SchedResource.configFromYaml( session )
-  end
-
-
-  # Process configuration file.
-  def self.configFromYaml( session )
-    configFromYaml1
-    configFromYaml2 session
-    config
-  end
-
-
-  def self.configFromYaml1()
-    self.config = { all_resources: [],
-                    rsrc_of_tag: {}, 
-                    blockClassForResourceKind: {}
-                   }
-    yml = YAML.load_file("config/schedule.yml")
-
-    yml['ResourceKinds'].each do |key, val|  # {"Channel" => <#Class Program>...}
-      config[:blockClassForResourceKind][key] = eval val
-    end
-
-    if (rkls = yml['Resources'])        # Resource Kind Lists, eg
-      rkls.each do |rkl|                # ["Timeheaderhour", "Hour0"]
-        rkl = rkl.split(/[, ]+/)        # ["Channel",    "702", "703",... ]
-        rk  = rkl.shift
-        config[:all_resources] += rkl.map{|subId| makeResourceOfKind(rk, subId)}
-      end
-    end
-
-    config[:visibleTime] = (vt = yml['visibleTime']) ? (eval vt) : 3.hours
-    config
-  end
-
-
-  def self.configFromYaml2( session )
-    config[:rsrcs_by_kind] = resourceList.group_by{ |r| r.kind }
-
-    config[:rsrcs_by_kind].each do |kind, rsrcs|
-      klass = eval kind
-      rsrcs.each do |rsrc|
-        klass.find_as_schedule_resource(rsrc.subId).decorateResource rsrc
-      end
-    end
-
-    session[:scheduleConfig] = config
-  end
-
-
-  def self.composeTag( kind, subId ); "#{kind}_#{subId}" end
-
-
-  def initialize( kind, subId )
-
-    @tag = self.class.composeTag( kind, subId )  # WAS: rsrc
-    @label = @title = nil
-    config[:rsrc_of_tag][@tag] = self
+    get_for( klass.name, rid )
   end
 
 

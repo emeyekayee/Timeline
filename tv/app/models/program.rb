@@ -27,8 +27,8 @@ class Program < ActiveRecord::Base
   #
   # Here the resource is a channel and the blocks are programs.
   # 
-  def Program.get_all_blocks( rIds, t1, t2, inc )
-    chanids = rIds.map{ |rId| Channel.find_as_schedule_resource(rId).chanid }
+  def Program.get_all_blocks( rids, t1, t2, inc )
+    chanids = rids.map{ |rid| Channel.find_as_schedule_resource(rid).chanid }
     
     condlo = "(endtime) > "
     condlo = "(starttime) >=" if inc == 'hi'
