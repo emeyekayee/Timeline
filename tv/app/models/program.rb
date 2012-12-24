@@ -144,9 +144,9 @@ end
 # After initial creation of class Program...
 Program.define_attribute_methods()
 
-TZ_OFFSET = Time.now.gmt_offset     # => -25200 
-
 class Program < ActiveRecord::Base
+  TZ_OFFSET = Time.now.gmt_offset     # => -25200 
+
   def starttime_with_local_tz()  
     (starttime_without_local_tz - TZ_OFFSET).localtime 
   end

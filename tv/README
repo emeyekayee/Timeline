@@ -1,9 +1,9 @@
 
 
-Timeline is a schedule widget, initially built for Rails, that uses
-Javascript, prototype.js and AJAX to show how resources are used over time.
-The basic building-block is a DOM block (a resource row) containing a label
-and a timespan:
+Timeline is a schedule widget, built on Rails, that uses Javascript,
+jQuery and AJAX to show how resources are used over time.  The basic
+building-block is a DOM block (a resource row) containing a label and
+a timespan:
 
                 +-------+----------------------+
                 | label |       timespan       |
@@ -11,25 +11,30 @@ and a timespan:
                 +-------+----------------------+
 
 The timespan contains a set of blocks, each describing the use of that
-resource over an interval in that timespan.  If the resource is "Channel 3"
+resource over an interval of that timespan.  If the resource is "Channel 3"
 and each block is a "tv program" you have one row of a tv schedule.  See the
 example Rails app in example/tv.
 
-Resource rows stack atop one-another and the timespans scroll left or right.
+Resource rows stack atop one-another; the timespans scroll left and right.
 All the timespans in a schedule scroll in lock-step.  New blocks are fetched
 from the server as needed, AJAX-style.
 
 Time is represented in the usual seconds-since-Jan-1-1970-GMT.  The only thing
-time-specific about this as the X-axis is that it maps to an continuous
+time-specific about this as the X-axis is that it maps to a continuous
 integer range.
+
+Model classes SchedResource and ResourceUseBlock maintain the mappings between
+the abstract schedule resources, resource uses, and the concrete model
+classes they represent. 
 
 The representation is flexible.  For example, headers showing time-of-day (See
 the example app.) are just another kind of resource -- one whose label is
 simply the text "Hour" and whose blocks are time segments with text: "9:30",
 "9:45"...  Same applies for the date header.
 
-Time blocks of all resources are clipped to the visible part of the schedule.
-So you can also create toolbars or headers that appear not to scroll with
+
+Time blocks of all resources are clipped to the visible part of the schedule,
+so you can also create toolbars or headers that *appear* not to scroll with
 time.  Just make a resource with a single time block that has very small/large
 start/endtimes.  
 

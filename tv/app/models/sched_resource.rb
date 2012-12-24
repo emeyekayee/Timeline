@@ -43,21 +43,22 @@ class SchedResource
   class_attribute :config
 
   # config is loaded from config/schedule.yml.
-  #  all_resources               Resources in display order
-  #  rsrcs_by_kind               Resources (above) grouped by kind (a hash)
-  #  rsrc_of_tag                 Indexed by text tag: kind_sub_id
-  #  visible_time                Span of time window.
-  #  block_class_for_resource_kind
+  #   all_resources           Resources in display order
+  #   rsrcs_by_kind           Resources (above) grouped by 
+  #                             kind (resource class) (a hash)
+  #   rsrc_of_tag             Indexed by text tag: kind_subid
+  #   visible_time            Span of time window.
+  #   block_class_for_resource_kind
   #
   # When queried with an array of ids and a time interval, the class
   # method <tt>get_all_blocks(ids, t1, t2)</tt> of a <em>resource use</em>
   # model returns a list of "use blocks", each with a starttime, endtime
   # and descriptions of that use.
   #
-  # This method invokes invokes that method on each of the <em>resource use<em>
-  # classes.  It return a hash where:
-  #   Key is a Resource (rsrc);
-  #   Value is an array of use-block instances.
+  # This method invokes invokes that method on each of the <em>resource use</em>
+  # classes.  It returns a hash where:
+  #   Key   is a Resource (rsrc);
+  #   Value is an array of use-block instances (rubs).
   #
   def self.get_all_blocks(t1, t2, inc)
     blockss = {}
@@ -74,31 +75,10 @@ class SchedResource
   end
 
 
-  def self.add_rubs_of_kind( kind, ru_blkss, blockss )
-    ru_blkss.each do |rid, blks|
-      rsrc = get_for( kind, rid )
-      rubs = blks.map{ |blk| ResourceUseBlock.new rsrc, blk }
-      blockss[ rsrc ] = rubs
-    end
-  end
-
-
   def self.block_class_for_resource_name( name )
     config[:block_class_for_resource_kind][name]
   end
 
-
-  # A caching one-of-each-sort constructor.
-  # - kind: string (a class name)
-  # - sub_id: string id, selecting a resource instance
-  # The two are combined and used as a unique tag -- as a
-  #  - DOM id/class on the client and
-  #  - In server code.
-  #
-  def self.get_for( kind, sub_id )
-    tag = compose_tag( kind, sub_id )
-    config[:rsrc_of_tag][ tag ] || self.new( kind, sub_id )
-  end
 
   def self.resource_list; config[:all_resources] end
 
@@ -125,6 +105,21 @@ class SchedResource
     config
   end
 
+  def self.compose_tag( kind, sub_id ); "#{kind}_#{sub_id}" end
+
+
+  private
+  # A caching one-of-each-sort constructor.
+  # - kind: string (a class name)
+  # - sub_id: string id, selecting a resource instance
+  # The two are combined and used as a unique tag -- as a
+  #  - DOM id/class on the client and
+  #  - In server code.
+  #
+  def self.get_for( kind, sub_id )
+    tag = compose_tag( kind, sub_id )
+    config[:rsrc_of_tag][ tag ] || self.new( kind, sub_id )
+  end
 
   def self.config_from_yaml1()
     self.config = { all_resources: [],
@@ -138,7 +133,7 @@ class SchedResource
     end
 
     if (rkls = yml['Resources'])        # Resource Kind Lists, eg
-      rkls.each do |rkl|                # ["Timeheaderhour", "Hour0"]
+      rkls.each do |rkl|                # ["TimeheaderHour", "Hour0"]
         rkl = rkl.split(/[, ]+/)        # ["Channel",    "702", "703",... ]
         rk  = rkl.shift
         config[:all_resources] += rkl.map{|sub_id| make_resource_of_kind(rk, sub_id)}
@@ -163,13 +158,23 @@ class SchedResource
     session[:schedule_config] = config
   end
 
+  def self.make_resource_of_kind( klass, rid )
+    klass = eval klass if klass.class == String
+    get_for( klass.name, rid )
+  end
 
-  def self.compose_tag( kind, sub_id ); "#{kind}_#{sub_id}" end
+  def self.add_rubs_of_kind( kind, ru_blkss, blockss )
+    ru_blkss.each do |rid, blks|
+      rsrc = get_for( kind, rid )
+      rubs = blks.map{ |blk| ResourceUseBlock.new rsrc, blk }
+      blockss[ rsrc ] = rubs
+    end
+  end
 
 
+  public
 
   # Instance methods
-
   def initialize( kind, sub_id )
     @tag = self.class.compose_tag( kind, sub_id )
     @label = @title = nil
@@ -186,12 +191,6 @@ class SchedResource
   def title();     @title || @tag end
 
   def css_classes_for_row(); "rsrcRow #{self.kind}row #{@tag}row" end
-
-  def self.make_resource_of_kind( klass, rid )
-    klass = eval klass if klass.class == String
-    get_for( klass.name, rid )
-  end
-
 
 end # class SchedResource
 
