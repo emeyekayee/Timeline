@@ -1,4 +1,4 @@
-# sched_resource.rb  
+# sched_resource.rb
 # Copyright (c) 2008-2012 Mike Cannon (http://github.com/emeyekayee/Timeline)
 # (michael.j.cannon@gmail.com)
 # See class SchedResource.
@@ -13,70 +13,78 @@ require 'timeheader'
 # A mouse click on the block pops up the "owner" and other
 # information about the meeting.
 #
-# Class SchedResource manages class names, id's and labels for a 
+# Class SchedResource manages class names, id's and labels for a
 # schedule.  An instance ties together:
-# 
-# 1) a <em>resource</em> class (eg Room),  
+#
+# 1) a <em>resource</em> class (eg Room),
 # 2) an id, and
 # 3) a few strings / html snippets (eg, label, title) for the DOM
 #
 # The id (2 above) is used to
 #
 # a) select a resource <em>instance</em> and
-# 
+#
 # b) select instances of the <em>resource use block</em> class (eg Meeting).
-# 
+#
 # The id <em>may</em> be a database id but need not be.
-# It is used <em>only</em> by class methods
+# It is used <em>only</em> by model class methods
 # <tt>Resource.find_as_schedule_resource</tt> and
 # <tt>ResourceUseBlock.get_all_blocks</tt>.
 #
 # Not tying this to a database id
 # allows a little extra flexibility and simple optimization.
 #
-# Items 1 and 2 are are combined (with a '_') to form a "tag" for the DOM.
+# Items 1 and 2 are are combined (with a '_') to form "tags" (ids) for the DOM.
 #
-# See also:              ResourceUseBlock (below).
+# See also:              ResourceUseBlock.
 #
 class SchedResource
- 
-  @@config = nil              
 
-  # @@config is loaded from config/schedule.yml.
+  class_attribute :config
+
+  # config is loaded from config/schedule.yml.
   #  all_resources               Resources in display order
   #  rsrcs_by_kind               Resources (above) grouped by kind (a hash)
   #  rsrc_of_tag                 Indexed by text tag: kind_subId
   #  visibleTime                 Span of time window.
-  #  blockClassForResourceKind   
+  #  blockClassForResourceKind
   #
   # When queried with an array of ids and a time interval, the class
   # method <tt>get_all_blocks(ids, t1, t2)</tt> of a <em>resource use</em>
   # model returns a list of "use blocks", each with a starttime, endtime
   # and descriptions of that use.
-  # 
+  #
   # This method invokes invokes that method on each of the <em>resource use<em>
   # classes.  It return a hash where:
   #   Key is a Resource (rsrc);
   #   Value is an array of use-block instances.
-  # 
+  #
   def self.get_all_blocks(t1, t2, inc)
     blockss = {}
 
-    @@config[:rsrcs_by_kind].each{ |kind, rsrcs|
-      rubClass =  block_class_for_resource_name( kind )
-      ruBlks = rubClass.get_all_blocks( rsrcs.map{|r| r.subId}, t1, t2, inc )
+    config[:rsrcs_by_kind].each do |kind, rsrcs|
+      rubClass = block_class_for_resource_name kind
+      rids     = rsrcs.map{ |r| r.subId }
+      ruBlkss  = rubClass.get_all_blocks rids, t1, t2, inc
 
-      ruBlks.each { |rid, blks|
-        rsrc = getFor( kind, rid )
-        blockss[ rsrc ] = blks.map{ |blk| ResourceUseBlock.new( rsrc, blk ) }
-      }
-    }
+      add_rubs_of_kind kind, ruBlkss, blockss
+    end
 
     blockss
   end
 
+
+  def self.add_rubs_of_kind( kind, ruBlkss, blockss )
+    ruBlkss.each do |rid, blks|
+      rsrc = getFor( kind, rid )
+      rubs = blks.map{ |blk| ResourceUseBlock.new rsrc, blk }
+      blockss[ rsrc ] = rubs
+    end
+  end
+
+
   def self.block_class_for_resource_name( name )
-    @@config[:blockClassForResourceKind][name]
+    config[:blockClassForResourceKind][name]
   end
 
 
@@ -89,22 +97,20 @@ class SchedResource
   #
   def self.getFor( kind, subId )
     tag = composeTag( kind, subId )
-    @@config[:rsrc_of_tag][ tag ] || self.new( kind, subId )
+    config[:rsrc_of_tag][ tag ] || self.new( kind, subId )
   end
 
-  def self.config; @@config end
-  
-  def self.resourceList; @@config[:all_resources] end
+  def self.resourceList; config[:all_resources] end
 
-  def self.visibleTime;  @@config[:visibleTime] end
+  def self.visibleTime;  config[:visibleTime] end
 
 
 
   # Instance methods
 
   def kind()    @tag.sub( /_.*/, '' )          end
-  def subId()   @tag.sub( /.*_/, '' )          end 
-  def to_s()    @tag end
+  def subId()   @tag.sub( /.*_/, '' )          end
+  def to_s()    @tag                           end
   def inspect() "<#SchedResource \"#{@tag}\">" end
 
   attr_accessor :label, :title
@@ -126,7 +132,7 @@ class SchedResource
   # kept, eg, in a per-user table in the database.
   #
   def self.ensureConfig( session )
-    return if (@@config ||= session[:scheduleConfig])
+    return if (config ||= session[:scheduleConfig])
 
     SchedResource.configFromYaml( session )
   end
@@ -135,46 +141,46 @@ class SchedResource
   # Process configuration file.
   def self.configFromYaml( session )
     configFromYaml1
-    configFromYaml2 session 
-    @@config
+    configFromYaml2 session
+    config
   end
-    
+
 
   def self.configFromYaml1()
-    @@config = { visibleTime: nil, rsrcs_by_kind: nil, all_resources: [] }
-    @@config[:rsrc_of_tag]   = {}
-    @@config[:blockClassForResourceKind] = {} 
-
+    self.config = { all_resources: [],
+                    rsrc_of_tag: {}, 
+                    blockClassForResourceKind: {}
+                   }
     yml = YAML.load_file("config/schedule.yml")
 
-    yml['ResourceKinds'].each{ |key, val|  # {"Channel" => <#Class Program>... }
-      @@config[:blockClassForResourceKind][key] = eval val
-    }
-
-    if (rkls = yml['Resources'])        # Resource Kind Lists, eg
-      rkls.each{ |rkl|                  # ["Timeheaderhour", "Hour0"]
-        rkl = rkl.split(/[, ]+/)        # ["Channel",    "702", "703",... ]
-        rk  = rkl.shift
-        @@config[:all_resources] += rkl.map{|subId| makeResourceOfKind(rk, subId) }
-      }
+    yml['ResourceKinds'].each do |key, val|  # {"Channel" => <#Class Program>...}
+      config[:blockClassForResourceKind][key] = eval val
     end
 
-    @@config[:visibleTime] = (vt = yml['visibleTime']) ? (eval vt) : 3.hours
-    @@config
+    if (rkls = yml['Resources'])        # Resource Kind Lists, eg
+      rkls.each do |rkl|                # ["Timeheaderhour", "Hour0"]
+        rkl = rkl.split(/[, ]+/)        # ["Channel",    "702", "703",... ]
+        rk  = rkl.shift
+        config[:all_resources] += rkl.map{|subId| makeResourceOfKind(rk, subId)}
+      end
+    end
+
+    config[:visibleTime] = (vt = yml['visibleTime']) ? (eval vt) : 3.hours
+    config
   end
 
 
   def self.configFromYaml2( session )
-    @@config[:rsrcs_by_kind] = resourceList.group_by{ |r| r.kind }
+    config[:rsrcs_by_kind] = resourceList.group_by{ |r| r.kind }
 
-    @@config[:rsrcs_by_kind].each do |kind, rsrcs|
+    config[:rsrcs_by_kind].each do |kind, rsrcs|
       klass = eval kind
-      rsrcs.each { |rsrc|
+      rsrcs.each do |rsrc|
         klass.find_as_schedule_resource(rsrc.subId).decorateResource rsrc
-      }
+      end
     end
 
-    session[:scheduleConfig] = @@config
+    session[:scheduleConfig] = config
   end
 
 
@@ -182,10 +188,10 @@ class SchedResource
 
 
   def initialize( kind, subId )
-    
+
     @tag = self.class.composeTag( kind, subId )  # WAS: rsrc
     @label = @title = nil
-    @@config[:rsrc_of_tag][@tag] = self
+    config[:rsrc_of_tag][@tag] = self
   end
 
 
