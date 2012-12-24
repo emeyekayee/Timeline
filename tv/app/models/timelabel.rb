@@ -3,8 +3,8 @@
 #                                     (michael.j.cannon@gmail.com)
 # Abstract class, customized below for different kinds of time labels.
 
-require 'timeheader.rb'
-require 'timelabeldaynight.rb'
+require 'timeheader'
+require 'timelabeldaynight'
 
 class Timelabel
   attr_accessor :starttime, :endtime, :css_classes, :block_label

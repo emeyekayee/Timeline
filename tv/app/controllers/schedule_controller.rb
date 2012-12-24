@@ -39,6 +39,8 @@ class ScheduleController < ApplicationController
   end
 
 
+  private
+  
   # Set up instance variables for render templates
   #  params:  @t1:      time-inverval start
   #           @t2:      time-inverval end

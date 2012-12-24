@@ -3,8 +3,8 @@
 # (michael.j.cannon@gmail.com)
 # See class SchedResource.
 
-require 'timelabel.rb'
-require 'timeheader.rb'
+require 'timelabel'
+require 'timeheader'
 
 # A "schedule resource" is something that can be used for one thing at a time.
 #
