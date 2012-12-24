@@ -10,17 +10,16 @@ require 'timelabel'
 class Timeheader
   @@header_by_rid = {}
 
+  def initialize( rid )
+    @@header_by_rid[@rid = rid] = self
+  end
+
   # For SchedResource
   # Return Timeheader* object from resource id (string)
   def self.find_as_schedule_resource(rid)
     @@header_by_rid[rid] || (@@header_by_rid[rid] = new(rid))
   end
 
-  def initialize( rid )
-    @@header_by_rid[@rid = rid] = self
-  end
-
-  # For SchedResource
   def decorateResource( rsrc )
     klass = SchedResource.block_class_for_resource_name(self.class.name)
     rsrc.label = klass.label
@@ -28,10 +27,4 @@ class Timeheader
   end
 
 end  
-
-class TimeheaderdayNight < Timeheader
-end
-
-class Timeheaderhour < Timeheader
-end
 
