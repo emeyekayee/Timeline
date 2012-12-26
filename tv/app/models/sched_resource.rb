@@ -16,9 +16,9 @@ require 'timeheader'
 # Class SchedResource manages class names, id's and labels for a
 # schedule.  An instance ties together:
 #
-# 1) a <em>resource</em> class (eg Room),
-# 2) an id, and
-# 3) a few strings / html snippets (eg, label, title) for the DOM
+#  1. A resource class (eg Room),
+#  2. An id, and
+#  3. Strings / html snippets (eg, label, title) for the DOM.
 #
 # The id (2 above) is used to
 #
@@ -30,36 +30,35 @@ require 'timeheader'
 # It is used <em>only</em> by model class methods
 # <tt>Resource.find_as_schedule_resource</tt> and
 # <tt>ResourceUseBlock.get_all_blocks</tt>.
-#
 # Not tying this to a database id
-# allows a little extra flexibility and simple optimization.
+# allows a little extra flexibility.
 #
 # Items 1 and 2 are are combined (with a '_') to form "tags" (ids) for the DOM.
 #
 # See also:              ResourceUseBlock.
 #
+#--
+# Config is loaded from config/schedule.yml:
+# all_resources::      Resources in display order.
+# rsrcs_by_kind::      A hash with resources grouped by kind (resource class).
+# rsrc_of_tag::        Indexed by text tag: kind_subid.
+# \visible_time::       Span of time window.
+#++
+#
+# When queried with an array of ids and a time interval, the class
+# method <tt>get_all_blocks(ids, t1, t2)</tt> of a <em>resource use</em>
+# model returns a list of "use blocks", each with a starttime, endtime
+# and descriptions of that use.
+#
+# This method invokes that method on each of the <em>resource use</em>
+# classes.  It returns a hash where:
+#   Key     is a Resource (rsrc);
+#   Value   is an array of use-block instances (rubs).
+#
 class SchedResource
 
   class_attribute :config
 
-  # config is loaded from config/schedule.yml.
-  #   all_resources           Resources in display order
-  #   rsrcs_by_kind           Resources (above) grouped by 
-  #                             kind (resource class) (a hash)
-  #   rsrc_of_tag             Indexed by text tag: kind_subid
-  #   visible_time            Span of time window.
-  #   block_class_for_resource_kind
-  #
-  # When queried with an array of ids and a time interval, the class
-  # method <tt>get_all_blocks(ids, t1, t2)</tt> of a <em>resource use</em>
-  # model returns a list of "use blocks", each with a starttime, endtime
-  # and descriptions of that use.
-  #
-  # This method invokes invokes that method on each of the <em>resource use</em>
-  # classes.  It returns a hash where:
-  #   Key   is a Resource (rsrc);
-  #   Value is an array of use-block instances (rubs).
-  #
   def self.get_all_blocks(t1, t2, inc)
     blockss = {}
 
@@ -85,13 +84,14 @@ class SchedResource
   def self.visible_time;  config[:visible_time] end
 
 
+  #--
   # Restore configuration from session.
   #
   # OK, Ok, this would not be RESTful if we were actually maintaining any
   # state here.  But if there <em>were</em> such state it would likely be
   # kept, eg, in a per-user table in the database.
-  #
-  def self.ensure_config( session )
+  #++
+  def self.ensure_config( session ) # :nodoc:
     return if (config ||= session[:schedule_config])
 
     SchedResource.config_from_yaml( session )
@@ -183,8 +183,14 @@ class SchedResource
 
   def kind()    @tag.sub( /_.*/, '' )          end
   def sub_id()  @tag.sub( /.*_/, '' )          end
-  def to_s()    @tag                           end
-  def inspect() "<#SchedResource \"#{@tag}\">" end
+
+  def to_s() # :nodoc:
+    @tag
+  end 
+
+  def inspect() # :nodoc:
+    "<#SchedResource \"#{@tag}\">"
+  end 
 
   attr_accessor :label, :title
   def label();     @label || @tag end

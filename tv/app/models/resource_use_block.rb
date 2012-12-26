@@ -3,10 +3,10 @@
 #
 # Represents the USE of a resource for an interval of time.
 #
-#  Resource X UseModel X time X time;
-#   |         |^^^^^^^
-#   |         | tv: Program   [ belongs_to :channel    ]
-#   |         |     Timelabel ["belongs_to :timeheader"]
+#  Resource X UseModel X [startime..endtime];
+#   |         | Example -- tv:
+#   |         |   Program   [ belongs_to :channel    ]
+#   |         |   Timelabel [ belongs_to :timeheader ]
 #   |
 #   | Example -- tv: Channel, HeaderSlot
 #

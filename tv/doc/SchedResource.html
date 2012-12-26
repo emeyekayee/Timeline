@@ -74,8 +74,6 @@
     
     <li><a href="#method-c-config_from_yaml">::config_from_yaml</a>
     
-    <li><a href="#method-c-ensure_config">::ensure_config</a>
-    
     <li><a href="#method-c-get_all_blocks">::get_all_blocks</a>
     
     <li><a href="#method-c-resource_list">::resource_list</a>
@@ -84,13 +82,9 @@
     
     <li><a href="#method-i-css_classes_for_row">#css_classes_for_row</a>
     
-    <li><a href="#method-i-inspect">#inspect</a>
-    
     <li><a href="#method-i-kind">#kind</a>
     
     <li><a href="#method-i-sub_id">#sub_id</a>
-    
-    <li><a href="#method-i-to_s">#to_s</a>
     
   </ul>
 </nav>
@@ -156,8 +150,10 @@ the block pops up the "owner" and other information about the meeting.</p>
 <p>Class <a href="SchedResource.html">SchedResource</a> manages class names,
 id's and labels for a schedule.  An instance ties together:</p>
 
-<p>1) a <em>resource</em> class (eg Room), 2) an id, and 3) a few strings /
-html snippets (eg, label, title) for the DOM</p>
+<pre class="ruby"><span class="ruby-value">1</span>. <span class="ruby-constant">A</span> <span class="ruby-identifier">resource</span> <span class="ruby-keyword">class</span> (<span class="ruby-identifier">eg</span> <span class="ruby-constant">Room</span>),
+<span class="ruby-value">2</span>. <span class="ruby-constant">An</span> <span class="ruby-identifier">id</span>, <span class="ruby-keyword">and</span>
+<span class="ruby-value">3</span>. <span class="ruby-constant">Strings</span> <span class="ruby-operator">/</span> <span class="ruby-identifier">html</span> <span class="ruby-identifier">snippets</span> (<span class="ruby-identifier">eg</span>, <span class="ruby-identifier">label</span>, <span class="ruby-identifier">title</span>) <span class="ruby-keyword">for</span> <span class="ruby-identifier">the</span> <span class="ruby-constant">DOM</span>.
+</pre>
 
 <p>The id (2 above) is used to</p>
 
@@ -168,16 +164,25 @@ html snippets (eg, label, title) for the DOM</p>
 <p>The id <em>may</em> be a database id but need not be. It is used
 <em>only</em> by model class methods
 <code>Resource.find_as_schedule_resource</code> and
-<code>ResourceUseBlock.get_all_blocks</code>.</p>
-
-<p>Not tying this to a database id allows a little extra flexibility and
-simple optimization.</p>
+<code>ResourceUseBlock.get_all_blocks</code>. Not tying this to a database
+id allows a little extra flexibility.</p>
 
 <p>Items 1 and 2 are are combined (with a '_') to form "tags" (ids) for the
 DOM.</p>
 
 <p>See also:              <a
 href="ResourceUseBlock.html">ResourceUseBlock</a>.</p>
+
+<p>When queried with an array of ids and a time interval, the class method
+<code>get_all_blocks(ids, t1, t2)</code> of a <em>resource use</em> model
+returns a list of "use blocks", each with a starttime, endtime and
+descriptions of that use.</p>
+
+<p>This method invokes that method on each of the <em>resource use</em>
+classes.  It returns a hash where:</p>
+
+<pre>Key     is a Resource (rsrc);
+Value   is an array of use-block instances (rubs).</pre>
 
   </div><!-- description -->
 
@@ -248,7 +253,7 @@ href="ResourceUseBlock.html">ResourceUseBlock</a>.</p>
 
           
           <div class="method-source-code" id="block_class_for_resource_name-source">
-            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 78</span>
+            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 77</span>
 <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">block_class_for_resource_name</span>( <span class="ruby-identifier">name</span> )
   <span class="ruby-identifier">config</span>[<span class="ruby-value">:block_class_for_resource_kind</span>][<span class="ruby-identifier">name</span>]
 <span class="ruby-keyword">end</span></pre>
@@ -294,42 +299,6 @@ href="ResourceUseBlock.html">ResourceUseBlock</a>.</p>
       </div><!-- config_from_yaml-method -->
 
     
-      <div id="method-c-ensure_config" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">ensure_config</span><span
-            class="method-args">( session )</span>
-          <span class="method-click-advice">click to toggle source</span>
-        </div>
-        
-
-        <div class="method-description">
-          
-          <p>Restore configuration from session.</p>
-
-<p>OK, Ok, this would not be RESTful if we were actually maintaining any state
-here.  But if there <em>were</em> such state it would likely be kept, eg,
-in a per-user table in the database.</p>
-          
-
-          
-          <div class="method-source-code" id="ensure_config-source">
-            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 94</span>
-<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">ensure_config</span>( <span class="ruby-identifier">session</span> )
-  <span class="ruby-keyword">return</span> <span class="ruby-keyword">if</span> (<span class="ruby-identifier">config</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">session</span>[<span class="ruby-value">:schedule_config</span>])
-
-  <span class="ruby-constant">SchedResource</span>.<span class="ruby-identifier">config_from_yaml</span>( <span class="ruby-identifier">session</span> )
-<span class="ruby-keyword">end</span></pre>
-          </div><!-- ensure_config-source -->
-          
-        </div>
-
-        
-
-        
-      </div><!-- ensure_config-method -->
-
-    
       <div id="method-c-get_all_blocks" class="method-detail ">
         
         <div class="method-heading">
@@ -341,31 +310,12 @@ in a per-user table in the database.</p>
 
         <div class="method-description">
           
-          <p>config is loaded from config/schedule.yml.</p>
-
-<pre class="ruby"><span class="ruby-identifier">all_resources</span>           <span class="ruby-constant">Resources</span> <span class="ruby-keyword">in</span> <span class="ruby-identifier">display</span> <span class="ruby-identifier">order</span>
-<span class="ruby-identifier">rsrcs_by_kind</span>           <span class="ruby-constant">Resources</span> (<span class="ruby-identifier">above</span>) <span class="ruby-identifier">grouped</span> <span class="ruby-identifier">by</span> 
-                          <span class="ruby-identifier">kind</span> (<span class="ruby-identifier">resource</span> <span class="ruby-keyword">class</span>) (<span class="ruby-identifier">a</span> <span class="ruby-identifier">hash</span>)
-<span class="ruby-identifier">rsrc_of_tag</span>             <span class="ruby-constant">Indexed</span> <span class="ruby-identifier">by</span> <span class="ruby-identifier">text</span> <span class="ruby-identifier">tag</span><span class="ruby-operator">:</span> <span class="ruby-identifier">kind_subid</span>
-<span class="ruby-identifier">visible_time</span>            <span class="ruby-constant">Span</span> <span class="ruby-identifier">of</span> <span class="ruby-identifier">time</span> <span class="ruby-identifier">window</span>.
-<span class="ruby-identifier">block_class_for_resource_kind</span>
-</pre>
-
-<p>When queried with an array of ids and a time interval, the class method
-<code>get_all_blocks(ids, t1, t2)</code> of a <em>resource use</em> model
-returns a list of "use blocks", each with a starttime, endtime and
-descriptions of that use.</p>
-
-<p>This method invokes invokes that method on each of the <em>resource
-use</em> classes.  It returns a hash where:</p>
-
-<pre>Key   is a Resource (rsrc);
-Value is an array of use-block instances (rubs).</pre>
+          
           
 
           
           <div class="method-source-code" id="get_all_blocks-source">
-            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 63</span>
+            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 62</span>
 <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">get_all_blocks</span>(<span class="ruby-identifier">t1</span>, <span class="ruby-identifier">t2</span>, <span class="ruby-identifier">inc</span>)
   <span class="ruby-identifier">blockss</span> = {}
 
@@ -405,7 +355,7 @@ Value is an array of use-block instances (rubs).</pre>
 
           
           <div class="method-source-code" id="resource_list-source">
-            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 83</span>
+            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 82</span>
 <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">resource_list</span>; <span class="ruby-identifier">config</span>[<span class="ruby-value">:all_resources</span>] <span class="ruby-keyword">end</span></pre>
           </div><!-- resource_list-source -->
           
@@ -433,7 +383,7 @@ Value is an array of use-block instances (rubs).</pre>
 
           
           <div class="method-source-code" id="visible_time-source">
-            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 85</span>
+            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 84</span>
 <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">visible_time</span>;  <span class="ruby-identifier">config</span>[<span class="ruby-value">:visible_time</span>] <span class="ruby-keyword">end</span></pre>
           </div><!-- visible_time-source -->
           
@@ -467,7 +417,7 @@ Value is an array of use-block instances (rubs).</pre>
 
           
           <div class="method-source-code" id="css_classes_for_row-source">
-            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 193</span>
+            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 199</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">css_classes_for_row</span>(); <span class="ruby-node">&quot;rsrcRow #{self.kind}row #{@tag}row&quot;</span> <span class="ruby-keyword">end</span></pre>
           </div><!-- css_classes_for_row-source -->
           
@@ -477,34 +427,6 @@ Value is an array of use-block instances (rubs).</pre>
 
         
       </div><!-- css_classes_for_row-method -->
-
-    
-      <div id="method-i-inspect" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">inspect</span><span
-            class="method-args">()</span>
-          <span class="method-click-advice">click to toggle source</span>
-        </div>
-        
-
-        <div class="method-description">
-          
-          
-          
-
-          
-          <div class="method-source-code" id="inspect-source">
-            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 187</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">inspect</span>() <span class="ruby-node">&quot;&lt;#SchedResource \&quot;#{@tag}\&quot;&gt;&quot;</span> <span class="ruby-keyword">end</span></pre>
-          </div><!-- inspect-source -->
-          
-        </div>
-
-        
-
-        
-      </div><!-- inspect-method -->
 
     
       <div id="method-i-kind" class="method-detail ">
@@ -561,34 +483,6 @@ Value is an array of use-block instances (rubs).</pre>
 
         
       </div><!-- sub_id-method -->
-
-    
-      <div id="method-i-to_s" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">to_s</span><span
-            class="method-args">()</span>
-          <span class="method-click-advice">click to toggle source</span>
-        </div>
-        
-
-        <div class="method-description">
-          
-          
-          
-
-          
-          <div class="method-source-code" id="to_s-source">
-            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 186</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_s</span>()    <span class="ruby-ivar">@tag</span>                           <span class="ruby-keyword">end</span></pre>
-          </div><!-- to_s-source -->
-          
-        </div>
-
-        
-
-        
-      </div><!-- to_s-method -->
 
     
     </section><!-- public-instance-method-details -->
