@@ -13,25 +13,24 @@ a timespan:
 The timespan contains a set of blocks, each describing the use of that
 resource over an interval of that timespan.  If the resource is "Channel 3"
 and each block is a "tv program" you have one row of a tv schedule.  See the
-example Rails app in example/tv.
+example Rails app in tv/.
 
-Resource rows stack atop one-another; the timespans scroll left and right.
-All the timespans in a schedule scroll in lock-step.  New blocks are fetched
-from the server as needed, AJAX-style.
+Resource rows stack atop one-another.  All the timespans in a schedule
+scroll left and right in lock-step.  New blocks are fetched from the
+server as needed, AJAX-style.
 
-Time is represented in the usual seconds-since-Jan-1-1970-GMT.  The only thing
-time-specific about this as the X-axis is that it maps to a continuous
-integer range.
+Time is represented in the usual seconds-since-Jan-1-1970-GMT, though
+the only thing time-specific about this as the X-axis is that it maps
+to a continuous range.
 
-Model classes SchedResource and ResourceUseBlock maintain the mappings between
-the abstract schedule resources, resource uses, and the concrete model
-classes they represent. 
+The model classes SchedResource and ResourceUseBlock maintain the
+mappings between the abstract schedule resources and resource uses, and
+the concrete model classes they represent.
 
 The representation is flexible.  For example, headers showing time-of-day (See
 the example app.) are just another kind of resource -- one whose label is
 simply the text "Hour" and whose blocks are time segments with text: "9:30",
 "9:45"...  Same applies for the date header.
-
 
 Time blocks of all resources are clipped to the visible part of the schedule,
 so you can also create toolbars or headers that *appear* not to scroll with

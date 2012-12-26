@@ -2,7 +2,7 @@
 
 <html>
 <head>
-<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+<meta content="text/html; charset=US-ASCII" http-equiv="Content-Type">
 
 <title>class SchedResource - RDoc Documentation</title>
 
@@ -146,15 +146,15 @@
 
   <div id="description" class="description">
     
-<p>A “schedule resource” is something that can be used for one thing at a
+<p>A "schedule resource" is something that can be used for one thing at a
 time.</p>
 
 <p>Example: A Room (resource) is scheduled for a meeting (resource use block)
-titled “Weekly Staff Meeting” tomorrow from 9am to 11am. A mouse click on
-the block pops up the “owner” and other information about the meeting.</p>
+titled "Weekly Staff Meeting" tomorrow from 9am to 11am. A mouse click on
+the block pops up the "owner" and other information about the meeting.</p>
 
 <p>Class <a href="SchedResource.html">SchedResource</a> manages class names,
-id’s and labels for a schedule.  An instance ties together:</p>
+id's and labels for a schedule.  An instance ties together:</p>
 
 <p>1) a <em>resource</em> class (eg Room), 2) an id, and 3) a few strings /
 html snippets (eg, label, title) for the DOM</p>
@@ -173,7 +173,7 @@ html snippets (eg, label, title) for the DOM</p>
 <p>Not tying this to a database id allows a little extra flexibility and
 simple optimization.</p>
 
-<p>Items 1 and 2 are are combined (with a ‘_’) to form “tags” (ids) for the
+<p>Items 1 and 2 are are combined (with a '_') to form "tags" (ids) for the
 DOM.</p>
 
 <p>See also:              <a
@@ -353,7 +353,7 @@ in a per-user table in the database.</p>
 
 <p>When queried with an array of ids and a time interval, the class method
 <code>get_all_blocks(ids, t1, t2)</code> of a <em>resource use</em> model
-returns a list of “use blocks”, each with a starttime, endtime and
+returns a list of "use blocks", each with a starttime, endtime and
 descriptions of that use.</p>
 
 <p>This method invokes invokes that method on each of the <em>resource

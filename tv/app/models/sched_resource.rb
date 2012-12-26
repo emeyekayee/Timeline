@@ -105,8 +105,6 @@ class SchedResource
     config
   end
 
-  def self.compose_tag( kind, sub_id ); "#{kind}_#{sub_id}" end
-
 
   private
   # A caching one-of-each-sort constructor.
@@ -120,6 +118,8 @@ class SchedResource
     tag = compose_tag( kind, sub_id )
     config[:rsrc_of_tag][ tag ] || self.new( kind, sub_id )
   end
+
+  def self.compose_tag( kind, sub_id ); "#{kind}_#{sub_id}" end
 
   def self.config_from_yaml1()
     self.config = { all_resources: [],
@@ -175,8 +175,8 @@ class SchedResource
   public
 
   # Instance methods
-  def initialize( kind, sub_id )
-    @tag = self.class.compose_tag( kind, sub_id )
+  def initialize( kind, sub_id ) # :nodoc:
+    @tag = self.class.send( :compose_tag, kind, sub_id )
     @label = @title = nil
     config[:rsrc_of_tag][@tag] = self
   end

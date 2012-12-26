@@ -1,4 +1,4 @@
-class TimelabeldayNight < Timelabel
+class TimelabelDayNight < Timelabel
   self.label   = 'Day'
   self.format  = '<span class="ampmLeft" > %P </span>' +
                  '<span class="ampmCenter">&nbsp %a %B %d &nbsp&nbsp </span>' +

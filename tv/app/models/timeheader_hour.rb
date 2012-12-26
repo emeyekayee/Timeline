@@ -1,3 +1,3 @@
-class Timeheaderhour < Timeheader
+class TimeheaderHour < Timeheader
 end
 
