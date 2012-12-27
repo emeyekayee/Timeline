@@ -53,7 +53,7 @@ class ResourceSchedule
 
   # t1, t2  Lower, Upper  time bounds for which data is requested.
   # inc     One of: "lo", "hi".
-  request_data: (parms) -> $.get 'groupupdate', parms
+  request_data: (parms) -> $.get '/schedule/groupupdate', parms
 
 
   # Newly-arrived content has been inserted into the document.

@@ -92,7 +92,7 @@ class SchedResource
   # kept, eg, in a per-user table in the database.
   #++
   def self.ensure_config( session ) # :nodoc:
-    return if (config ||= session[:schedule_config])
+    return if (self.config ||= session[:schedule_config])
 
     SchedResource.config_from_yaml( session )
   end
