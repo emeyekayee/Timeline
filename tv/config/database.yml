@@ -45,6 +45,6 @@ production:
   reconnect: true
   database: mythconverg
   pool: 5
-  username: mythtv
-  password: 'Xdl5bjo6'
-  host: mjc3
+  username: root
+  # password: 'Xdl5bjo6'
+  # host: mjc3
