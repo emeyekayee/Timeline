@@ -43,8 +43,8 @@ production:
   adapter: mysql2
   encoding: utf8
   reconnect: true
-  database: tvg_production
+  database: mythconverg
   pool: 5
-  username: root
-  # password: 'Xdl5bjo6'
-  # host: mjc3
+  username: mythtv
+  password: 'Xdl5bjo6'
+  host: mjc3

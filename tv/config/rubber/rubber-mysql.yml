@@ -1,12 +1,12 @@
 
 # REQUIRED: The credentials for creating/accessong your app's database
-#
-db_user: "#{app_name[0,16]}"
+# WAS: "#{app_name[0,16]}", "#{app_name}_#{Rubber.env}"
+db_user: "root"
 db_pass:
-db_name: "#{app_name}_#{Rubber.env}"
+db_name: "mythconverg"
 
-db_slave_user: "#{('slave_' + db_user)[0,16]}"
-db_replicator_user: "#{('replicator_' + db_user)[0,16]}"
+db_slave_user: "root"
+db_replicator_user: "root"
 
 # REQUIRED: The command to use to do a full backup of your database using
 #           "rubber util:backup_db"
