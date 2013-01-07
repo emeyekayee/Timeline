@@ -26,6 +26,8 @@ class ResourceSchedule
     a = (parseInt($(@schedElt).attr t) for t in ['starttime', 'endtime'])
     [@tlo, @thi] = [@t0, @tn] = a
 
+    @server_tz_offset = Math.round((@t0 - @ux_time_now()) / 3600) * 3600
+
     # (@new_tlo || @new_thi) means An AJAX request is pending and will be
     @new_tlo = @new_thi = null   # the new bound when request is completed.
 
@@ -69,7 +71,10 @@ class ResourceSchedule
       ts.time_update_row_view( @t0, @tn )
 
 
-  oldness: -> (new Date).valueOf() / 1000 - @t0
+  ux_time_now: -> Math.round((new Date).valueOf() / 1000)
+
+  oldness: -> @ux_time_now() - @t0 + @server_tz_offset
+
   update_check: ->
     return if @debug
     age = @oldness()          # Too old: assume user manually moved view back
