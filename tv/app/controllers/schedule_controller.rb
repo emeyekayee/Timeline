@@ -9,23 +9,13 @@ class ScheduleController < ApplicationController
     render :action => 'schedule'
   end
 
-  def test
-    SchedResource.config_from_yaml session
-    @text = ""
-    config = SchedResource.config
-    config.keys.each{|key| @text << "\n#{key}:\n" + config[key].inspect}
-  end
-
   def schedule
     SchedResource.send( params[:reset] ? :config_from_yaml : :ensure_config,
                         session )
-                        
-    tNow = (Time.now + 5.minutes)
-    tNow = tNow.change( :min => (tNow.min/15) * 15 )
-    @t1 = params[:t1] || tNow
+
+    @t1 = params[:t1] || time_default
     @t2 = params[:t2] || @t1 + SchedResource.visible_time
     @inc= params[:inc]
-
     get_data_for_time_span
   end
 
@@ -38,9 +28,24 @@ class ScheduleController < ApplicationController
     get_data_for_time_span
   end
 
+  def test
+    SchedResource.config_from_yaml session
+    @text = ""
+    config = SchedResource.config
+    config.keys.each{|key| @text << "\n#{key}:\n" + config[key].inspect}
+  end
 
+  
   private
   
+  def time_default
+    z_offset = ActiveSupport::TimeZone['Pacific Time (US & Canada)'].utc_offset - 
+               Time.now.utc_offset   # Typically, for deployment to UTC server 
+
+    t_now = Time.now + z_offset
+    t_now.change :min => (t_now.min/15) * 15
+  end
+
   # Set up instance variables for render templates
   #  params:  @t1:      time-inverval start
   #           @t2:      time-inverval end
@@ -49,7 +54,6 @@ class ScheduleController < ApplicationController
   #  creates: @rsrcs    ordered resource list
   #           @blockss: lists of use-blocks, keyed by resource
   def get_data_for_time_span()
-
     @t1 = Time.at(@t1.to_i)
     @t2 = Time.at(@t2.to_i)
 
