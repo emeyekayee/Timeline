@@ -19,7 +19,7 @@ describe ScheduleController do
   describe "Validate resource specifications" do
     it "Has only valid resource specs." do
 
-      rsrcs = SchedResource.configFromYaml1[:all_resources]            
+      rsrcs = SchedResource.config_from_yaml1[:all_resources]            
       rsrcs.all?.should == true
 
     end
@@ -27,11 +27,11 @@ describe ScheduleController do
 
 
   describe "Validate configuration consistency." do
-    it "Shows a consistent set of resource classes.." do
+    it "Shows a consistent set of resource classes." do
 
-      config = SchedResource.configFromYaml({})
+      config = SchedResource.config_from_yaml({})
       
-      kinds1 = config[:blockClassForResourceKind].keys
+      kinds1 = config[:block_class_for_resource_kind].keys
       kinds2 = config[:rsrcs_by_kind].keys
 
       (kinds1 - kinds2).should == []
@@ -43,7 +43,7 @@ describe ScheduleController do
       kinds.each{ |kind| 
         config[:rsrcs_by_kind][kind].length.should be > 0
 
-        klass = config[:blockClassForResourceKind][kind].class
+        klass = config[:block_class_for_resource_kind][kind].class
 
         klass.should == Class
       }

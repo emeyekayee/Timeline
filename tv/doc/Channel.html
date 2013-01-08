@@ -165,12 +165,12 @@ href="http://github.com/emeyekayee/Timeline">github.com/emeyekayee/Timeline</a>)
 
         <div class="method-description">
           
-          <p>Convenience</p>
+          <p>Methods for (<a href="SchedResource.html">SchedResource</a>)</p>
           
 
           
           <div class="method-source-code" id="channel_by_num-source">
-            <pre><span class="ruby-comment"># File app/models/channel.rb, line 19</span>
+            <pre><span class="ruby-comment"># File app/models/channel.rb, line 18</span>
 <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">channel_by_num</span>() <span class="ruby-identifier">@@channel_by_num</span> <span class="ruby-keyword">end</span></pre>
           </div><!-- channel_by_num-source -->
           
@@ -193,12 +193,26 @@ href="http://github.com/emeyekayee/Timeline">github.com/emeyekayee/Timeline</a>)
 
         <div class="method-description">
           
-          <p>Return <a href="Channel.html">Channel</a> object from channum (String)</p>
+          <p>(For <a href="SchedResource.html">SchedResource</a> protocol)  Returns a <a
+href="Channel.html">Channel</a> object from channum.  This lets us specify
+the yml configuration with regular channel numbers rather than funky
+database id integers.</p>
+
+<h4 id="method-c-find_as_schedule_resource-label-Parameters">Parameters</h4>
+<ul><li>
+<p><code>channum</code> - A channel number (string) as we usually think of it
+rather than the chanid, the database id for this table.</p>
+</li></ul>
+
+<h4 id="method-c-find_as_schedule_resource-label-Returns">Returns</h4>
+<ul><li>
+<p><code>Channel</code></p>
+</li></ul>
           
 
           
           <div class="method-source-code" id="find_as_schedule_resource-source">
-            <pre><span class="ruby-comment"># File app/models/channel.rb, line 22</span>
+            <pre><span class="ruby-comment"># File app/models/channel.rb, line 30</span>
 <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">find_as_schedule_resource</span> (<span class="ruby-identifier">rid</span>)
   <span class="ruby-identifier">@@channel_by_num</span>[<span class="ruby-identifier">rid</span>] <span class="ruby-comment"># rid is channum</span>
 <span class="ruby-keyword">end</span></pre>
@@ -229,12 +243,20 @@ href="http://github.com/emeyekayee/Timeline">github.com/emeyekayee/Timeline</a>)
 
         <div class="method-description">
           
-          
+          <p>(For <a href="SchedResource.html">SchedResource</a> protocol)  This method
+lets us set display attributes on the instance in a resource-class-specific
+way.</p>
+
+<h4 id="method-i-decorate_resource-label-Parameters">Parameters</h4>
+<ul><li>
+<p><code>rsrc</code> - A <a href="SchedResource.html">SchedResource</a>
+instance.</p>
+</li></ul>
           
 
           
           <div class="method-source-code" id="decorate_resource-source">
-            <pre><span class="ruby-comment"># File app/models/channel.rb, line 26</span>
+            <pre><span class="ruby-comment"># File app/models/channel.rb, line 39</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">decorate_resource</span>( <span class="ruby-identifier">rsrc</span> )
   <span class="ruby-identifier">rsrc</span>.<span class="ruby-identifier">label</span> = <span class="ruby-keyword">self</span>.<span class="ruby-identifier">channum</span>
   <span class="ruby-identifier">rsrc</span>.<span class="ruby-identifier">title</span> = <span class="ruby-keyword">self</span>.<span class="ruby-identifier">name</span>

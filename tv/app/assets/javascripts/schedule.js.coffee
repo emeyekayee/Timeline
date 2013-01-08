@@ -20,16 +20,20 @@ class ResourceSchedule
       @schedElt.delegate '.blockdiv a', e, InfoPopup.mouseOverOutHand
 
 
+  # Time range [@t0..@tn ] will be visible.
+  # Time range [@tlo..@thi] is where the DOM has data.
   init_time_bounds: ->
-    # Time range [@t0..@tn ] will be visible.
-    # Time range [@tlo..@thi] is where the DOM has data.
-    a = (parseInt($(@schedElt).attr t) for t in ['starttime', 'endtime'])
-    [@tlo, @thi] = [@t0, @tn] = a
+    [@tlo, @thi] = [@t0, @tn] =
+      (parseInt($(@schedElt).attr t) for t in ['starttime', 'endtime'])
 
     @server_tz_offset = Math.round((@t0 - @ux_time_now()) / 3600) * 3600
+    @new_tlo = @new_thi = null
 
-    # (@new_tlo || @new_thi) means An AJAX request is pending and will be
-    @new_tlo = @new_thi = null   # the new bound when request is completed.
+
+  # (@new_tlo || @new_thi) means An AJAX request is pending.  The non-null
+  # one will be the new bound when request is completed.
+  request_pending: -> @new_thi || @new_tlo
+
 
   init_timespans: ->
     @timespans =
@@ -37,11 +41,16 @@ class ResourceSchedule
 
 
   slide_time: (delta) ->
-    return false  if ( @new_thi || @new_tlo )  # --OR-- queue the request  XXXX
     @t0 += delta
     @tn += delta
-
     @time_update_view()
+    @maybe_request_data delta
+
+
+  maybe_request_data: (delta) ->
+    if @request_pending()
+      console.log('Ignoring slide_time request: ' + new Date)
+      return # --OR-- queue the request  XXXX
 
     if delta >= 0
       if (@thi - @tn) < @lowater
@@ -78,7 +87,7 @@ class ResourceSchedule
   update_check: ->
     return if @debug
     age = @oldness()          # Too old: assume user manually moved view back
-    @slide_time @fifteen_min if age >= @ten_min  &&  age <  2 * @ten_min
+    @slide_time @fifteen_min if age >= @ten_min  # &&  age <  2 * @ten_min
 
 # end class ResourceSchedule
 # ------------------------------------------------------------------------
@@ -114,19 +123,19 @@ class ResourceUseTimeSpan
     b0 = @block0
     bn = @blockn
 
-    while (n = bn.nextElementSibling)  &&  @canonize(n)  &&  n.starttime < tn
+    while (n = bn.nextElementSibling)     && @canonize(n)  &&  n.starttime < tn
       $(n).insertBefore($(bn)).show()     # extend_up_thru
       @vis_blocks.push(bn);
 
-    while (n = b0.previousElementSibling)  &&  @canonize(n)  &&  n.endtime > t0
+    while (n = b0.previousElementSibling) && @canonize(n)  &&  n.endtime   > t0
       $(n).insertAfter($(b0)).show()      # extend_down_thru
       @vis_blocks.unshift(n);
 
-    while (n = b0.nextElementSibling)  &&  n.endtime <= t0
+    while (n = b0.nextElementSibling)     && n.endtime   <= t0
       $(n).insertBefore($(b0)).hide()     # retract_up
       @vis_blocks.shift()
 
-    while (n = bn.previousElementSibling)  &&  n.starttime >= tn
+    while (n = bn.previousElementSibling) && n.starttime >= tn
       $(n).insertAfter($(bn)).hide()      # retract_down
       @vis_blocks.pop()
 
@@ -135,6 +144,7 @@ class ResourceUseTimeSpan
     [ @t0, @tn ]               = [ t0, tn ]
     @adjust_visible_time_bounds    t0, tn
     @set_places_and_widths_by_time t0, tn
+
 
   set_places_and_widths_by_time: (tMIN, tMAX) ->
     timeToPixScale =  (@spanwidth + 6) / (tMAX - tMIN) # Fudge factor

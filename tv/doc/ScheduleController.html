@@ -170,7 +170,7 @@
 
           
           <div class="method-source-code" id="groupupdate-source">
-            <pre><span class="ruby-comment"># File app/controllers/schedule_controller.rb, line 32</span>
+            <pre><span class="ruby-comment"># File app/controllers/schedule_controller.rb, line 22</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">groupupdate</span>
   <span class="ruby-constant">SchedResource</span>.<span class="ruby-identifier">ensure_config</span> <span class="ruby-identifier">session</span>
 
@@ -236,17 +236,14 @@
 
           
           <div class="method-source-code" id="schedule-source">
-            <pre><span class="ruby-comment"># File app/controllers/schedule_controller.rb, line 19</span>
+            <pre><span class="ruby-comment"># File app/controllers/schedule_controller.rb, line 12</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">schedule</span>
   <span class="ruby-constant">SchedResource</span>.<span class="ruby-identifier">send</span>( <span class="ruby-identifier">params</span>[<span class="ruby-value">:reset</span>] <span class="ruby-operator">?</span> <span class="ruby-value">:config_from_yaml</span> <span class="ruby-operator">:</span> <span class="ruby-value">:ensure_config</span>,
                       <span class="ruby-identifier">session</span> )
-                      
-  <span class="ruby-identifier">tNow</span> = (<span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span> <span class="ruby-operator">+</span> <span class="ruby-value">5</span>.<span class="ruby-identifier">minutes</span>)
-  <span class="ruby-identifier">tNow</span> = <span class="ruby-identifier">tNow</span>.<span class="ruby-identifier">change</span>( <span class="ruby-value">:min</span> =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">tNow</span>.<span class="ruby-identifier">min</span><span class="ruby-operator">/</span><span class="ruby-value">15</span>) * <span class="ruby-value">15</span> )
-  <span class="ruby-ivar">@t1</span> = <span class="ruby-identifier">params</span>[<span class="ruby-value">:t1</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">tNow</span>
+
+  <span class="ruby-ivar">@t1</span> = <span class="ruby-identifier">params</span>[<span class="ruby-value">:t1</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">time_default</span>
   <span class="ruby-ivar">@t2</span> = <span class="ruby-identifier">params</span>[<span class="ruby-value">:t2</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@t1</span> <span class="ruby-operator">+</span> <span class="ruby-constant">SchedResource</span>.<span class="ruby-identifier">visible_time</span>
   <span class="ruby-ivar">@inc</span>= <span class="ruby-identifier">params</span>[<span class="ruby-value">:inc</span>]
-
   <span class="ruby-identifier">get_data_for_time_span</span>
 <span class="ruby-keyword">end</span></pre>
           </div><!-- schedule-source -->
@@ -306,7 +303,7 @@
 
           
           <div class="method-source-code" id="test-source">
-            <pre><span class="ruby-comment"># File app/controllers/schedule_controller.rb, line 12</span>
+            <pre><span class="ruby-comment"># File app/controllers/schedule_controller.rb, line 31</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">test</span>
   <span class="ruby-constant">SchedResource</span>.<span class="ruby-identifier">config_from_yaml</span> <span class="ruby-identifier">session</span>
   <span class="ruby-ivar">@text</span> = <span class="ruby-string">&quot;&quot;</span>

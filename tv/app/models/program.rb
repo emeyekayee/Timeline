@@ -16,17 +16,29 @@ class Program < ActiveRecord::Base
     category category_type stars airdate previouslyshown).join(', ')
   
 
-  # Returns a hash where each key is a <tt>SchedResource</tt> object
-  # corresponding to a resource id and the value is an array of
-  # blocks in the interval <tt>t1...t2</tt>, ordered by
+  # (SchedResource protocol) Returns a hash where each key is a
+  # resource id (channel number) and the value is an array of
+  # Programs in the interval <tt>t1...t2</tt>, ordered by
   # <tt>starttime</tt>.
   #
   # What <em>in</em> means depends on *inc*.  If inc(remental) is 
-  # false, client is building interval from scratch.  If "hi", 
-  # it is an addition to an existing interval on the high side.
+  # false, client is building interval from scratch.  If "hi", it is
+  # an addition to an existing interval on the high side.  Similarly
+  # for "lo".  This is to avoid re-transmitting blocks that span the
+  # current time boundaries on the client.
   #
-  # Here the resource is a channel and the blocks are programs.
+  # Here the resource is a channel and the use blocks are programs.
   # 
+  # ==== Parameters
+  # * <tt>rids</tt> - A list of schedules resource ids (strings).
+  # * <tt>t1</tt>   - Start time.
+  # * <tt>t2</tt>   - End time.
+  # * <tt>inc</tt>  - One of nil, "lo", "hi" (As above).
+  #
+  # ==== Returns
+  # * <tt>Hash</tt> - Each key is a <tt>rid</tt> (here, channel number)
+  # and the value is an array of Programs in the interval, ordered by
+  # <tt>starttime</tt>.
   def Program.get_all_blocks( rids, t1, t2, inc )
     chanids = rids.map{ |rid| Channel.find_as_schedule_resource(rid).chanid }
     
@@ -49,7 +61,7 @@ class Program < ActiveRecord::Base
     blks.group_by { |pgm| pgm.channel.channum }
   end
 
-  # Figure css classes for program block display using...
+  # Calculate css classes for program block display using...
   #   - prog.category_type (eg, "series", ...)
   #   - prog.category      (eg, "news", "howto", ...)
   #
@@ -97,7 +109,6 @@ class Program < ActiveRecord::Base
 #  language this file defines (it will not be translated separately),
 #  and a regular expression pattern used to match the category against
 #  those provided in the listings.
-#
   @@Categories = {
     'Action'         =>  ['Action',           /\b(action|adven)/i],
     'Adult'          =>  ['Adult',            /\b(adult|erot)/i],
@@ -146,7 +157,11 @@ Program.define_attribute_methods()
 
 class Program < ActiveRecord::Base
   TZ_OFFSET = Time.now.gmt_offset     # => -25200 
-
+  #--
+  # This fails across DST boundaries and requires restart.  It could 
+  # be done better and is a hack due in part to an underlying problem
+  # in how time is represented in the mythtv database.
+  #++
   def starttime_with_local_tz()  
     (starttime_without_local_tz - TZ_OFFSET).localtime 
   end

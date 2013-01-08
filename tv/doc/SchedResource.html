@@ -144,8 +144,7 @@
 time.</p>
 
 <p>Example: A Room (resource) is scheduled for a meeting (resource use block)
-titled "Weekly Staff Meeting" tomorrow from 9am to 11am. A mouse click on
-the block pops up the "owner" and other information about the meeting.</p>
+titled "Weekly Staff Meeting" tomorrow from 9am to 11am.</p>
 
 <p>Class <a href="SchedResource.html">SchedResource</a> manages class names,
 id's and labels for a schedule.  An instance ties together:</p>
@@ -248,12 +247,21 @@ Value   is an array of use-block instances (rubs).</pre>
 
         <div class="method-description">
           
-          
+          <h4 id="method-c-block_class_for_resource_name-label-Parameters">Parameters</h4>
+<ul><li>
+<p><code>name</code>  - The class name (string) of a schedule resource.</p>
+</li></ul>
+
+<h4 id="method-c-block_class_for_resource_name-label-Returns">Returns</h4>
+<ul><li>
+<p><code>Class</code> - The class representing the <em>use</em> of that
+resource for an interval of time.</p>
+</li></ul>
           
 
           
           <div class="method-source-code" id="block_class_for_resource_name-source">
-            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 77</span>
+            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 100</span>
 <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">block_class_for_resource_name</span>( <span class="ruby-identifier">name</span> )
   <span class="ruby-identifier">config</span>[<span class="ruby-value">:block_class_for_resource_kind</span>][<span class="ruby-identifier">name</span>]
 <span class="ruby-keyword">end</span></pre>
@@ -283,7 +291,7 @@ Value   is an array of use-block instances (rubs).</pre>
 
           
           <div class="method-source-code" id="config_from_yaml-source">
-            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 102</span>
+            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 129</span>
 <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">config_from_yaml</span>( <span class="ruby-identifier">session</span> )
   <span class="ruby-identifier">config_from_yaml1</span>
   <span class="ruby-identifier">config_from_yaml2</span> <span class="ruby-identifier">session</span>
@@ -310,12 +318,41 @@ Value   is an array of use-block instances (rubs).</pre>
 
         <div class="method-description">
           
-          
+          <p>(<a href="SchedResource.html">SchedResource</a> protocol) Returns a hash
+where each key is an <code>rid</code> and the value is an array of resource
+use blocks in the interval <code>t1...t2</code>, ordered by
+<code>starttime</code>.</p>
+
+<p>What <em>in</em> means depends on <em>inc</em>.  If inc(remental) is 
+false, the client is building the interval from scratch.  If "hi", it is an
+addition to an existing interval on the high side.  Similarly for "lo". 
+This is to avoid re-transmitting blocks that span the current time
+boundaries on the client.</p>
+
+<p>Here the resource is a channel and the use blocks are programs.</p>
+
+<h4 id="method-c-get_all_blocks-label-Parameters">Parameters</h4>
+<ul><li>
+<p><code>rids</code> - A list of schedules resource ids (strings).</p>
+</li><li>
+<p><code>t1</code>   - Start time.</p>
+</li><li>
+<p><code>t2</code>   - End time.</p>
+</li><li>
+<p><code>inc</code>  - One of nil, "lo", "hi" (See above).</p>
+</li></ul>
+
+<h4 id="method-c-get_all_blocks-label-Returns">Returns</h4>
+<ul><li>
+<p><code>Hash</code> - Each key is an <code>rid</code> and the value is an
+array of resource use blocks in the interval, ordered by
+<code>starttime</code>.</p>
+</li></ul>
           
 
           
           <div class="method-source-code" id="get_all_blocks-source">
-            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 62</span>
+            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 80</span>
 <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">get_all_blocks</span>(<span class="ruby-identifier">t1</span>, <span class="ruby-identifier">t2</span>, <span class="ruby-identifier">inc</span>)
   <span class="ruby-identifier">blockss</span> = {}
 
@@ -350,12 +387,15 @@ Value   is an array of use-block instances (rubs).</pre>
 
         <div class="method-description">
           
-          
+          <h4 id="method-c-resource_list-label-Returns">Returns</h4>
+<ul><li>
+<p><code>Array[SchedResource]</code> - List of all configured SchedResources .</p>
+</li></ul>
           
 
           
           <div class="method-source-code" id="resource_list-source">
-            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 82</span>
+            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 107</span>
 <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">resource_list</span>; <span class="ruby-identifier">config</span>[<span class="ruby-value">:all_resources</span>] <span class="ruby-keyword">end</span></pre>
           </div><!-- resource_list-source -->
           
@@ -378,12 +418,15 @@ Value   is an array of use-block instances (rubs).</pre>
 
         <div class="method-description">
           
-          
+          <h4 id="method-c-visible_time-label-Returns">Returns</h4>
+<ul><li>
+<p><code>Time</code> - The configured width of the visible time window.</p>
+</li></ul>
           
 
           
           <div class="method-source-code" id="visible_time-source">
-            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 84</span>
+            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 111</span>
 <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">visible_time</span>;  <span class="ruby-identifier">config</span>[<span class="ruby-value">:visible_time</span>] <span class="ruby-keyword">end</span></pre>
           </div><!-- visible_time-source -->
           
@@ -412,12 +455,16 @@ Value   is an array of use-block instances (rubs).</pre>
 
         <div class="method-description">
           
-          
+          <h4 id="method-i-css_classes_for_row-label-Returns">Returns</h4>
+<ul><li>
+<p><code>String</code> - CSS classes automatically generated for the DOM row
+representing this <a href="SchedResource.html">SchedResource</a>.</p>
+</li></ul>
           
 
           
           <div class="method-source-code" id="css_classes_for_row-source">
-            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 199</span>
+            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 233</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">css_classes_for_row</span>(); <span class="ruby-node">&quot;rsrcRow #{self.kind}row #{@tag}row&quot;</span> <span class="ruby-keyword">end</span></pre>
           </div><!-- css_classes_for_row-source -->
           
@@ -440,12 +487,15 @@ Value   is an array of use-block instances (rubs).</pre>
 
         <div class="method-description">
           
-          
+          <h4 id="method-i-kind-label-Returns">Returns</h4>
+<ul><li>
+<p><code>String</code> - The class name of the scheduled resource.</p>
+</li></ul>
           
 
           
           <div class="method-source-code" id="kind-source">
-            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 184</span>
+            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 213</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">kind</span>()    <span class="ruby-ivar">@tag</span>.<span class="ruby-identifier">sub</span>( <span class="ruby-regexp">%r_.*/</span>, <span class="ruby-string">''</span> )          <span class="ruby-keyword">end</span></pre>
           </div><!-- kind-source -->
           
@@ -468,12 +518,16 @@ Value   is an array of use-block instances (rubs).</pre>
 
         <div class="method-description">
           
-          
+          <h4 id="method-i-sub_id-label-Returns">Returns</h4>
+<ul><li>
+<p><code>String</code> - The <code>rid</code> (abstract id) of the <a
+href="SchedResource.html">SchedResource</a>.</p>
+</li></ul>
           
 
           
           <div class="method-source-code" id="sub_id-source">
-            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 185</span>
+            <pre><span class="ruby-comment"># File app/models/sched_resource.rb, line 217</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">sub_id</span>()  <span class="ruby-ivar">@tag</span>.<span class="ruby-identifier">sub</span>( <span class="ruby-regexp">%r.*_/</span>, <span class="ruby-string">''</span> )          <span class="ruby-keyword">end</span></pre>
           </div><!-- sub_id-source -->
           

@@ -161,13 +161,26 @@
 
         <div class="method-description">
           
-          <p>For <a href="SchedResource.html">SchedResource</a> Return Timeheader*
-object from resource id (string)</p>
+          <p>(<a href="SchedResource.html">SchedResource</a> protocol)  Returns the
+corresponding <a href="Timeheader.html">Timeheader</a> object  given a
+resource id (string).  These rids (specified in schedule.yml) are pretty
+much arbitrary as long as they are unique for this resource class.</p>
+
+<h4 id="method-c-find_as_schedule_resource-label-Parameters">Parameters</h4>
+<ul><li>
+<p><code>rid</code> - A (string) resource id.</p>
+</li></ul>
+
+<h4 id="method-c-find_as_schedule_resource-label-Returns">Returns</h4>
+<ul><li>
+<p><code>Timeheader</code> - A <a href="Timeheader.html">Timeheader</a>
+corresponding to the given <code>rid</code>, such as 'Hour0'.</p>
+</li></ul>
           
 
           
           <div class="method-source-code" id="find_as_schedule_resource-source">
-            <pre><span class="ruby-comment"># File app/models/timeheader.rb, line 19</span>
+            <pre><span class="ruby-comment"># File app/models/timeheader.rb, line 27</span>
 <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">find_as_schedule_resource</span>( <span class="ruby-identifier">rid</span> )
   <span class="ruby-identifier">@@header_by_rid</span>[<span class="ruby-identifier">rid</span>] <span class="ruby-operator">||</span> (<span class="ruby-identifier">@@header_by_rid</span>[<span class="ruby-identifier">rid</span>] = <span class="ruby-identifier">new</span>(<span class="ruby-identifier">rid</span>))
 <span class="ruby-keyword">end</span></pre>
@@ -228,12 +241,20 @@ object from resource id (string)</p>
 
         <div class="method-description">
           
-          
+          <p>(For <a href="SchedResource.html">SchedResource</a> protocol)  This method
+lets us set display attributes on the instance in a resource-class-specific
+way.</p>
+
+<h4 id="method-i-decorate_resource-label-Parameters">Parameters</h4>
+<ul><li>
+<p><code>rsrc</code> - A <a href="SchedResource.html">SchedResource</a>
+instance.</p>
+</li></ul>
           
 
           
           <div class="method-source-code" id="decorate_resource-source">
-            <pre><span class="ruby-comment"># File app/models/timeheader.rb, line 23</span>
+            <pre><span class="ruby-comment"># File app/models/timeheader.rb, line 36</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">decorate_resource</span>( <span class="ruby-identifier">rsrc</span> )
   <span class="ruby-identifier">klass</span> = <span class="ruby-constant">SchedResource</span>.<span class="ruby-identifier">block_class_for_resource_name</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">name</span>)
   <span class="ruby-identifier">rsrc</span>.<span class="ruby-identifier">label</span> = <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">label</span>
