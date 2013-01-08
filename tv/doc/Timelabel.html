@@ -227,7 +227,7 @@
 
           
           <div class="method-source-code" id="floor-source">
-            <pre><span class="ruby-comment"># File app/models/timelabel.rb, line 34</span>
+            <pre><span class="ruby-comment"># File app/models/timelabel.rb, line 56</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Timelabel</span>.<span class="ruby-identifier">floor</span>(<span class="ruby-identifier">t</span>) <span class="ruby-identifier">t</span>; <span class="ruby-keyword">end</span></pre>
           </div><!-- floor-source -->
           
@@ -250,12 +250,42 @@
 
         <div class="method-description">
           
-          <p>ScheduledResource protocol...</p>
+          <p>(<a href="SchedResource.html">SchedResource</a> protocol) Returns a hash
+where each key is an <code>rid</code> and the value is an array of
+Timelabels (use blocks) in the interval <code>t1...t2</code>, ordered by
+<code>starttime</code>.</p>
+
+<p>What <em>in</em> means depends on <strong>inc</strong>.  If inc(remental)
+is  false, client is building interval from scratch.  If "hi", it is an
+addition to an existing interval on the high side.  Similarly for "lo". 
+This is to avoid re-transmitting blocks that span the current time
+boundaries on the client.</p>
+
+<p>Here the resource is a channel and the use blocks are programs.</p>
+
+<h4 id="method-c-get_all_blocks-label-Parameters">Parameters</h4>
+<ul><li>
+<p><code>rids</code> - A list of schedules resource ids (strings).</p>
+</li><li>
+<p><code>t1</code>   - Start time.</p>
+</li><li>
+<p><code>t2</code>   - End time.</p>
+</li><li>
+<p><code>inc</code>  - One of nil, "lo", "hi" (See above).</p>
+</li></ul>
+
+<h4 id="method-c-get_all_blocks-label-Returns">Returns</h4>
+<ul><li>
+<p><code>Hash</code> - Each key is a <code>rid</code> such as Hour0</p>
+</li></ul>
+
+<p>and the value is an array of Timelabels in the interval, ordered by
+<code>starttime</code>.</p>
           
 
           
           <div class="method-source-code" id="get_all_blocks-source">
-            <pre><span class="ruby-comment"># File app/models/timelabel.rb, line 20</span>
+            <pre><span class="ruby-comment"># File app/models/timelabel.rb, line 42</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Timelabel</span>.<span class="ruby-identifier">get_all_blocks</span>(<span class="ruby-identifier">ids</span>, <span class="ruby-identifier">t1</span>, <span class="ruby-identifier">t2</span>, <span class="ruby-identifier">inc</span>)
   <span class="ruby-identifier">h</span> = {}; <span class="ruby-identifier">ids</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">id</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">id</span>] = <span class="ruby-identifier">get_timeblocks</span>(<span class="ruby-identifier">id</span>, <span class="ruby-identifier">t1</span>, <span class="ruby-identifier">t2</span>, <span class="ruby-identifier">inc</span>)}; <span class="ruby-identifier">h</span>
 <span class="ruby-keyword">end</span></pre>
@@ -285,7 +315,7 @@
 
           
           <div class="method-source-code" id="get_timeblocks-source">
-            <pre><span class="ruby-comment"># File app/models/timelabel.rb, line 24</span>
+            <pre><span class="ruby-comment"># File app/models/timelabel.rb, line 46</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Timelabel</span>.<span class="ruby-identifier">get_timeblocks</span>(<span class="ruby-identifier">id</span>, <span class="ruby-identifier">t1</span>, <span class="ruby-identifier">t2</span>, <span class="ruby-identifier">inc</span>)
   <span class="ruby-identifier">klass</span> = <span class="ruby-keyword">self</span>
   <span class="ruby-identifier">it0</span>, <span class="ruby-identifier">it2</span>, <span class="ruby-identifier">itb</span> = [<span class="ruby-identifier">klass</span>.<span class="ruby-identifier">floor</span>(<span class="ruby-identifier">t1</span>), <span class="ruby-identifier">t2</span>, <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">t_block</span>].<span class="ruby-identifier">map</span>(&amp;<span class="ruby-value">:to_i</span>)
