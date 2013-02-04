@@ -55,7 +55,7 @@ class Program < ActiveRecord::Base
               t1.to_i,
               t2.to_i ]
 
-    rel1 = select(@@program_attrs).order("chanid MOD 1000, starttime")
+    rel1 = includes(:channel).select(@@program_attrs).order("chanid MOD 1000, starttime")
     blks = rel1.where(conds).each{ |pgm| pgm.set_visual_info }
 
     blks.group_by { |pgm| pgm.channel.channum }

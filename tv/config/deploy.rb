@@ -97,3 +97,27 @@ if Rubber::Util.has_asset_pipeline?
   before "deploy:assets:precompile", "deploy:assets:symlink"
   after "rubber:config", "deploy:assets:precompile"
 end
+
+
+# Customization --mjc
+
+set :from_db_host, 'cannon@mjc3'
+set :dump_file,    '/tmp/mythconverg.sql.gz'
+set :dcmd,         "mysqldump -u mythtv -pXdl5bjo6 mythconverg | " +
+                   "gzip - >#{dump_file}"
+
+task :dump_source_db, hosts: from_db_host do
+  `ssh #{from_db_host} "#{dcmd}"`
+  puts "The mysqldump completed with exit code #{$?}"
+
+  `scp -p #{from_db_host}:#{dump_file} #{dump_file}`
+  puts "Local copy completed with exit code #{$?}"
+end
+
+after "dump_source_db", "update_mythconverg_db"
+
+task :update_mythconverg_db, roles: "db:primary=true" do
+
+  `scp -i ~/.ec2/gpg-keypair #{dump_file} ubuntu@prod1.emeyekayee.com:#{dump_file}`
+
+end

@@ -35,9 +35,9 @@ test:
   reconnect: true
   database: myth_test
   pool: 5
-  username: myth_test
-  password: 'Xdl5bjo6'
-  host: mjc3
+  username: root
+  # password: 'Xdl5bjo6'
+  # host: mjc3
 
 production:
   adapter: mysql2
