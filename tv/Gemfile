@@ -37,6 +37,8 @@ group :development do
   gem 'autotest-growl', "~> 0.2.16"
 
   gem 'looksee'
+  gem 'better_errors'
+  gem 'meta_request'
 end
 
 group :test do
@@ -63,6 +65,8 @@ gem 'jquery-rails'
 
 # To use debugger
 # gem 'ruby-debug19', :require => 'ruby-debug'
+
+
 
 gem 'thin'
 gem 'rubber'

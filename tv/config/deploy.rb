@@ -105,7 +105,11 @@ set :from_db_host, 'cannon@mjc3'
 set :dump_file,    '/tmp/mythconverg.sql.gz'
 set :dcmd,         "mysqldump -u mythtv -pXdl5bjo6 mythconverg | " +
                    "gzip - >#{dump_file}"
+set :prod_db_host, 'ubuntu@prod1.emeyekayee.com'
 
+desc <<-DESC
+  Dump the local database for export to production database.
+DESC
 task :dump_source_db, hosts: from_db_host do
   `ssh #{from_db_host} "#{dcmd}"`
   puts "The mysqldump completed with exit code #{$?}"
@@ -114,10 +118,27 @@ task :dump_source_db, hosts: from_db_host do
   puts "Local copy completed with exit code #{$?}"
 end
 
-after "dump_source_db", "update_mythconverg_db"
 
-task :update_mythconverg_db, roles: "db:primary=true" do
+desc <<-DESC
+  Send the local database dump to production database.
+DESC
+task :update_mythconverg_db do # , :roles => :mysql_master
+  # master_instances = rubber_instances.for_role("mysql_master") & rubber_instances.filtered
+  # master_instances.each do |ic|
+  #   task_name = "_upload_mysql_master_#{ic.full_name}".to_sym()
+  #   task task_name, :hosts => ic.full_name do
+  #     env = rubber_cfg.environment.bind("mysql_master", ic.name)
+  #     rubber.sudo_script "create_master_db", <<-ENDSCRIPT
+  #       zcat #{} | mysql -u root -D mythconverg
+  #     ENDSCRIPT
+  # end
+  #
+  # end
 
-  `scp -i ~/.ec2/gpg-keypair #{dump_file} ubuntu@prod1.emeyekayee.com:#{dump_file}`
+  `scp -i ~/.ec2/gpg-keypair #{dump_file} #{prod_db_host}:#{dump_file}`
+
+  `ssh -i ~/.ec2/gpg-keypair #{prod_db_host} "zcat #{dump_file} | mysql -u root mythconverg"`
 
 end
+
+before "update_mythconverg_db", "dump_source_db"
