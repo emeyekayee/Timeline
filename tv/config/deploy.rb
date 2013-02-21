@@ -1,144 +1,34 @@
-# This is a sample Capistrano config file for rubber
+require "bundler/capistrano"
+require 'fast_git_deploy/enable'
 
-set :rails_env, Rubber.env
+set :application, "tvg"
+set :repository,  "https://github.com/emeyekayee/Timeline.git"
 
-on :load do
-  set :application, rubber_env.app_name
-  set :runner,      rubber_env.app_user
-  set :deploy_to,   "/mnt/#{application}-#{Rubber.env}"
-  set :copy_exclude, [".git/*", ".bundle/*", "log/*", ".rvmrc"]
+set :user, "ubuntu"
+set :use_sudo, false
+set :deploy_type, :deploy
+set :branch, "AWS-chef-deploy"
+
+default_run_options[:pty] = true
+ssh_options[:forward_agent] = true
+# ssh_options[:keys] = [File.join(ENV["HOME"], ".vagrant.d", "insecure_private_key")]
+
+role :app, "tvg.test"
+role :web, "tvg.test"
+role :db,  "tvg.test", :primary => true
+
+after "deploy:setup" do
+  deploy.fast_git_setup.clone_repository
+  run "cd #{current_path} && bundle install"
 end
 
-# Use a simple directory tree copy here to make demo easier.
-# You probably want to use your own repository for a real app
-set :scm, :none
-set :repository, "."
-set :deploy_via, :copy
-
-# Easier to do system level config as root - probably should do it through
-# sudo in the future.  We use ssh keys for access, so no passwd needed
-set :user, 'root'
-set :password, nil
-
-# Use sudo with user rails for cap deploy:[stop|start|restart]
-# This way exposed services (mongrel) aren't running as a privileged user
-set :use_sudo, true
-
-# How many old releases should be kept around when running "cleanup" task
-set :keep_releases, 3
-
-# Lets us work with staging instances without having to checkin config files
-# (instance*.yml + rubber*.yml) for a deploy.  This gives us the
-# convenience of not having to checkin files for staging, as well as 
-# the safety of forcing it to be checked in for production.
-set :push_instance_config, Rubber.env != 'production'
-
-# don't waste time bundling gems that don't need to be there 
-set :bundle_without, [:development, :test, :staging] if Rubber.env == 'production'
-
-# Allow us to do N hosts at a time for all tasks - useful when trying
-# to figure out which host in a large set is down:
-# RUBBER_ENV=production MAX_HOSTS=1 cap invoke COMMAND=hostname
-max_hosts = ENV['MAX_HOSTS'].to_i
-default_run_options[:max_hosts] = max_hosts if max_hosts > 0
-
-# Allows the tasks defined to fail gracefully if there are no hosts for them.
-# Comment out or use "required_task" for default cap behavior of a hard failure
-rubber.allow_optional_tasks(self)
-
-# Wrap tasks in the deploy namespace that have roles so that we can use FILTER
-# with something like a deploy:cold which tries to run deploy:migrate but can't
-# because we filtered out the :db role
-namespace :deploy do
-  rubber.allow_optional_tasks(self)
-  tasks.values.each do |t|
-    if t.options[:roles]
-      task t.name, t.options, &t.body
-    end
+namespace :unicorn do
+  desc "Start unicorn for this application"
+  task :start do
+    run "cd #{current_path} && bundle exec unicorn -c /etc/unicorn/tvg.conf.rb -D"
   end
 end
 
 namespace :deploy do
-  namespace :assets do
-    rubber.allow_optional_tasks(self)
-    tasks.values.each do |t|
-      if t.options[:roles]
-        task t.name, t.options, &t.body
-      end
-    end
-  end
+  task :create_symlink do; end
 end
-
-# load in the deploy scripts installed by vulcanize for each rubber module
-Dir["#{File.dirname(__FILE__)}/rubber/deploy-*.rb"].each do |deploy_file|
-  load deploy_file
-end
-
-# capistrano's deploy:cleanup doesn't play well with FILTER
-after "deploy", "cleanup"
-after "deploy:migrations", "cleanup"
-task :cleanup, :except => { :no_release => true } do
-  count = fetch(:keep_releases, 5).to_i
-  
-  rsudo <<-CMD
-    all=$(ls -x1 #{releases_path} | sort -n);
-    keep=$(ls -x1 #{releases_path} | sort -n | tail -n #{count});
-    remove=$(comm -23 <(echo -e "$all") <(echo -e "$keep"));
-    for r in $remove; do rm -rf #{releases_path}/$r; done;
-  CMD
-end
-
-if Rubber::Util.has_asset_pipeline?
-  # load asset pipeline tasks, and reorder them to run after
-  # rubber:config so that database.yml/etc has been generated
-  load 'deploy/assets'
-  callbacks[:after].delete_if {|c| c.source == "deploy:assets:precompile"}
-  callbacks[:before].delete_if {|c| c.source == "deploy:assets:symlink"}
-  before "deploy:assets:precompile", "deploy:assets:symlink"
-  after "rubber:config", "deploy:assets:precompile"
-end
-
-
-# Customization --mjc
-
-set :from_db_host, 'cannon@mjc3'
-set :dump_file,    '/tmp/mythconverg.sql.gz'
-set :dcmd,         "mysqldump -u mythtv -pXdl5bjo6 mythconverg | " +
-                   "gzip - >#{dump_file}"
-set :prod_db_host, 'ubuntu@prod1.emeyekayee.com'
-
-desc <<-DESC
-  Dump the local database for export to production database.
-DESC
-task :dump_source_db, hosts: from_db_host do
-  `ssh #{from_db_host} "#{dcmd}"`
-  puts "The mysqldump completed with exit code #{$?}"
-
-  `scp -p #{from_db_host}:#{dump_file} #{dump_file}`
-  puts "Local copy completed with exit code #{$?}"
-end
-
-
-desc <<-DESC
-  Send the local database dump to production database.
-DESC
-task :update_mythconverg_db do # , :roles => :mysql_master
-  # master_instances = rubber_instances.for_role("mysql_master") & rubber_instances.filtered
-  # master_instances.each do |ic|
-  #   task_name = "_upload_mysql_master_#{ic.full_name}".to_sym()
-  #   task task_name, :hosts => ic.full_name do
-  #     env = rubber_cfg.environment.bind("mysql_master", ic.name)
-  #     rubber.sudo_script "create_master_db", <<-ENDSCRIPT
-  #       zcat #{} | mysql -u root -D mythconverg
-  #     ENDSCRIPT
-  # end
-  #
-  # end
-
-  `scp -i ~/.ec2/gpg-keypair #{dump_file} #{prod_db_host}:#{dump_file}`
-
-  `ssh -i ~/.ec2/gpg-keypair #{prod_db_host} "zcat #{dump_file} | mysql -u root mythconverg"`
-
-end
-
-before "update_mythconverg_db", "dump_source_db"

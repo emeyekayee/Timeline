@@ -1,0 +1,49 @@
+= fast_git_deploy
+
+Before (with fast_remote_cache deploy strategy):
+
+    $ time cap staging deploy:update
+
+    ...
+
+    real	1m56.811s
+    user	0m0.560s
+    sys	0m0.118s
+
+
+After:
+
+    $ time cap staging deploy:update
+
+    ...
+
+    real	0m19.987s
+    user	0m0.538s
+    sys	0m0.110s
+
+== STATUS:
+
+This is still beta software - be warned.
+
+
+== Install in your rails app as a plugin:
+
+    $ script/plugin install git://github.com/smtlaissezfaire/fast_git_deploy.git
+
+
+== Install in your app via a gem:
+
+Add to your `config/deploy.rb`:
+
+    require 'fast_git_deploy/enable'
+
+
+== Switch an existing project:
+
+    $ cap deploy:warm
+
+== Setup a new project:
+
+    $ cap deploy:setup
+    $ cap deploy:cold
+    $ cap deploy
