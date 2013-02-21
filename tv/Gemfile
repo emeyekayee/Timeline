@@ -24,7 +24,6 @@ end
 group :development, :test do
   gem 'rspec-rails', "~> 2.9.0"
   gem 'ripl', "~> 0.6.0"
-  gem 'ripl-color_error', "~> 0.1.1"
   gem 'rb-readline'
   gem 'ffi', "~> 1.0.11"
   gem 'sys-uname', "~> 0.9.0"
@@ -45,10 +44,6 @@ group :test do
   gem 'webrat', '~> 0.7.3'
 end
 
-group :production do
-  gem 'passenger'
-end
-
 gem 'jquery-rails'
 
 # To use ActiveModel has_secure_password
@@ -58,19 +53,10 @@ gem 'jquery-rails'
 # gem 'jbuilder'
 
 # Use unicorn as the app server
-# gem 'unicorn'
+gem 'unicorn'
 
 # Deploy with Capistrano
-# gem 'capistrano'
+gem 'capistrano'
 
 # To use debugger
 # gem 'ruby-debug19', :require => 'ruby-debug'
-
-
-
-gem 'thin'
-gem 'rubber'
-gem 'open4'
-gem 'gelf'
-gem 'graylog2_exceptions', :git => 'git://github.com/wr0ngway/graylog2_exceptions.git'
-gem 'graylog2-resque'
