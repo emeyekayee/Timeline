@@ -12,6 +12,7 @@ set :branch, "AWS-chef-deploy"
 default_run_options[:pty] = true
 ssh_options[:forward_agent] = true
 # ssh_options[:keys] = [File.join(ENV["HOME"], ".vagrant.d", "insecure_private_key")]
+ssh_options[:keys] = [File.expand_path('~/.ec2/gpg-keypair')]
 
 role :app, "tvg.test"
 role :web, "tvg.test"
