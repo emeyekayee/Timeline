@@ -39,7 +39,8 @@ group :development do
   gem 'better_errors'
   gem 'meta_request'
 
-  gem 'fast_git_deploy', '0.1.0', path: "vendor/fast_git_deploy-0.1.0"
+  # gem 'fast_git_deploy', '0.1.0', path: "vendor/fast_git_deploy-0.1.0"
+  gem 'fast_git_deploy', '0.2.1'
 end
 
 group :test do

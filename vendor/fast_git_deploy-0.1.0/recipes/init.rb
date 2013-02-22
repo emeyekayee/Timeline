@@ -1,1 +1,0 @@
-require 'fast_git_deploy/enable'
