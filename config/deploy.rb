@@ -1,5 +1,5 @@
 require "bundler/capistrano"
-require 'fast_git_deploy/enable'
+# require 'fast_git_deploy/enable'
 
 set :application, "tvg"
 set :repository,  "https://github.com/emeyekayee/Timeline.git"
