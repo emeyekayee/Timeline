@@ -38,9 +38,6 @@ group :development do
   gem 'looksee'
   gem 'better_errors'
   gem 'meta_request'
-
-  # gem 'fast_git_deploy', '0.1.0', path: "vendor/fast_git_deploy-0.1.0"
-  gem 'fast_git_deploy', '0.2.1'
 end
 
 group :test do
@@ -60,6 +57,8 @@ gem 'unicorn'
 
 # Deploy with Capistrano
 gem 'capistrano'
+
+gem 'fast_git_deploy', '~> 0.2.1'
 
 # To use debugger
 # gem 'ruby-debug19', :require => 'ruby-debug'
