@@ -1,7 +1,5 @@
 
-  <% method = "html"                   
-     method = "append"  if @inc == "hi"
-     method = "prepend" if @inc == "lo"
+  <% method = { 'lo' => 'prepend', 'hi' => 'append' }[@inc]  || "html"
      
      @rsrcs.each do |rsrc|  
        html = render(:partial => 'spancontent',

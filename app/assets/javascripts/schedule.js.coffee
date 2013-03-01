@@ -27,13 +27,14 @@ class ResourceSchedule
       (parseInt($(@schedElt).attr t) for t in ['starttime', 'endtime'])
 
     @server_tz_offset = Math.round((@t0 - @ux_time_now()) / 3600) * 3600
-    @new_tlo = @new_thi = null
+    @reset_request()    
 
+
+  reset_request: -> @new_tlo = @new_thi = null
 
   # (@new_tlo || @new_thi) means An AJAX request is pending.  The non-null
   # one will be the new bound when request is completed.
   request_pending: -> @new_thi || @new_tlo
-
 
   init_timespans: ->
     @timespans =
@@ -64,7 +65,13 @@ class ResourceSchedule
 
   # t1, t2  Lower, Upper  time bounds for which data is requested.
   # inc     One of: "lo", "hi".
-  request_data: (parms) -> $.get '/schedule/groupupdate', parms
+  request_data: (parms) -> # $.get '/schedule/groupupdate', parms
+    self = this
+    $.ajax '/schedule/groupupdate', 
+      data: parms  
+      error: (jqXHR, textStatus, errorThrown) ->
+        self.reset_request()
+        console.log "AJAX error: #{textStatus}  #{errorThrown} (will retry)."
 
 
   # Newly-arrived content has been inserted into the document.
@@ -179,3 +186,4 @@ window.after_update = ->
 
 
 $( -> window.after_update() )
+

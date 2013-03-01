@@ -18,6 +18,17 @@ role :app, "tvg.test"
 role :web, "tvg.test"
 role :db,  "tvg.test", :primary => true
 
+set :normalize_asset_timestamps, false # task :finalize_update failing from
+                                       # images, etc not being under .../public
+set :public_children, []               # Yes, this is overkill.
+
+# require 'ripl'
+# Ripl.start binding: binding
+
+after "deploy:update_code" do  
+  run "cd #{release_path}/config && ln -nfs #{shared_path}/config/database.yml ."
+end
+
 after "deploy:setup" do
   deploy.fast_git_setup.clone_repository
   run "cd #{current_path} && bundle install"
@@ -30,6 +41,6 @@ namespace :unicorn do
   end
 end
 
-namespace :deploy do
-  task :create_symlink do; end
-end
+# namespace :deploy do
+#   task :create_symlink do; end
+# end

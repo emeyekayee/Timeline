@@ -12,19 +12,17 @@ class ScheduleController < ApplicationController
   def schedule
     SchedResource.send( params[:reset] ? :config_from_yaml : :ensure_config,
                         session )
-
-    @t1 = params[:t1] || time_default
-    @t2 = params[:t2] || @t1 + SchedResource.visible_time
-    @inc= params[:inc]
+    param_defaults params
     get_data_for_time_span
   end
 
   def groupupdate
     SchedResource.ensure_config session
 
-    @t1 = params[:t1]
-    @t2 = params[:t2]
-    @inc= params[:inc]
+    # @t1 = params[:t1]
+    # @t2 = params[:t2]
+    # @inc= params[:inc]
+    param_defaults params
     get_data_for_time_span
   end
 
@@ -38,6 +36,12 @@ class ScheduleController < ApplicationController
   
   private
   
+  def param_defaults(p = {})
+    @t1 = p[:t1] || time_default
+    @t2 = p[:t2] || @t1 + SchedResource.visible_time
+    @inc= p[:inc]
+  end
+
   def time_default
     z_offset = ActiveSupport::TimeZone['Pacific Time (US & Canada)'].utc_offset - 
                Time.now.utc_offset   # Typically, for deployment to UTC server 

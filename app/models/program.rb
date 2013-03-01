@@ -67,37 +67,38 @@ class Program < ActiveRecord::Base
   #
   # After .../mythweb/includes/css.php  v.18.1
   def set_visual_info ()
-    classes = ''
+    set_style_classes
+    set_block_label
+  end
 
-    ct = self.category_type
-    ct  &&  ct !~ /unknown/i  &&
-      classes << " type_" + ct.gsub( /[^a-zA-Z0-9\-_]+/, '_' )
-    classes << " " + to_css_class(self.category)
-    self.css_classes = classes
+  private
 
-    label = "#{self.title}"
+  def set_block_label
+    label = self.title
     label += ":<br/>&nbsp;#{self.subtitle}" if self.subtitle.length > 0
-            "#{self.title}:<br/>&nbsp;#{self.subtitle}"
     self.block_label = label.html_safe
   end
 
+  def set_style_classes()
+    self.css_classes = ct_name + " " + to_css_class(self.category)
+  end
 
-  protected
+  def ct_name
+    ct = self.category_type || ''
+    return '' if ct =~ /unknown/i
+    "type_#{ct.gsub(/[^a-z0-9\-_]+/i, '_')}"
+  end
 
-  def to_css_class ( cat )
-    clss = @@css_translation_cache[ cat ]
-    if ! clss
-      @@Categories.each { |key, val|
-        if (re = val[1]) && re =~ cat
-          clss = @@css_translation_cache[ cat ] = 'cat_' + key
-          break
-        end
-      }
+  def to_css_class ( cat, clss = nil )
+    return clss if (clss = @@css_translation_cache[ cat ])
+    @@css_translation_cache[ cat ] = css_class_search(cat) 
+  end
 
-      clss ||= @@css_translation_cache[ cat ] = 'cat_Unknown' 
+  def css_class_search ( cat )
+    @@Categories.each do |key, val|
+      return ('cat_' + key) if val =~ cat
     end
-    
-    clss
+    'cat_Unknown' 
   end
 
   
@@ -110,43 +111,38 @@ class Program < ActiveRecord::Base
 #  and a regular expression pattern used to match the category against
 #  those provided in the listings.
   @@Categories = {
-    'Action'         =>  ['Action',           /\b(action|adven)/i],
-    'Adult'          =>  ['Adult',            /\b(adult|erot)/i],
-    'Animals'        =>  ['Animals',          /\b(animal|tiere)/i],
-    'Art_Music'      =>  ['Art_Music',        /\b(art|dance|music|cultur)/i],
-    'Business'       =>  ['Business',         /\b(biz|busine)/i],
-    'Children'       =>  ['Children',         /\b(child|infan|animation)/i],
-    'Comedy'         =>  ['Comedy',           /\b(comed|entertain|sitcom)/i],
-    'Crime_Mystery'  =>  ['Crime / Mystery',  /\b(crim|myster)/i],
-    'Documentary'    =>  ['Documentary',      /\b(doc)/i],
-    'Drama'          =>  ['Drama',            /\b(drama)/i],
-    'Educational'    =>  ['Educational',      /\b(edu|interests)/i],
-    'Food'           =>  ['Food',             /\b(food|cook|drink)/i],
-    'Game'           =>  ['Game',             /\b(game)/i],
-    'Health_Medical' =>  ['Health / Medical', /\b(health|medic)/i],
-    'History'        =>  ['History',          /\b(hist)/i],
-    'Horror'         =>  ['Horror',           /\b(horror)/i],
-    'HowTo'          =>  ['HowTo',            /\b(how|home|house|garden)/i],
-    'Misc'           =>  ['Misc',        /\b(special|variety|info|collect)/i],
-    'News'           =>  ['News',             /\b(news|current)/i],
-    'Reality'        =>  ['Reality',          /\b(reality)/i],
-    'Romance'        =>  ['Romance',          /\b(romance)/i],
-    'SciFi_Fantasy'  =>  ['SciFi / Fantasy',  /\b(fantasy|sci\\w*\\W*fi)/i],
-    'Science_Nature' =>  ['Science / Nature', /\b(science|nature|environm)/i],
-    'Shopping'       =>  ['Shopping',         /\b(shop)/i],
-    'Soaps'          =>  ['Soaps',            /\b(soaps)/i],
-    'Spiritual'      =>  ['Spiritual',        /\b(spirit|relig)/i],
-    'Sports'         =>  ['Sports',           /\b(sport)/i],
-    'Talk'           =>  ['Talk',             /\b(talk)/i],
-    'Travel'         =>  ['Travel',           /\b(travel)/i],
-    'War'            =>  ['War',              /\b(war)/i],
-    'Western'        =>  ['Western',          /\b(west)/i],
-    #  These last two are some other classes that we might want to have
-    #  show up in the category legend (they don't need regular
-    #  expressions)
-    'Unknown'        =>  ['Unknown'],
-    'movie'          =>  ['Movie'  ]
-      }
+    'Action'         =>  /\b(action|adven)/i,
+    'Adult'          =>  /\b(adult|erot)/i,
+    'Animals'        =>  /\b(animal|tiere)/i,
+    'Art_Music'      =>  /\b(art|dance|music|cultur)/i,
+    'Business'       =>  /\b(biz|busine)/i,
+    'Children'       =>  /\b(child|infan|animation)/i,
+    'Comedy'         =>  /\b(comed|entertain|sitcom)/i,
+    'Crime_Mystery'  =>  /\b(crim|myster)/i,
+    'Documentary'    =>  /\b(doc)/i,
+    'Drama'          =>  /\b(drama)/i,
+    'Educational'    =>  /\b(edu|interests)/i,
+    'Food'           =>  /\b(food|cook|drink)/i,
+    'Game'           =>  /\b(game)/i,
+    'Health_Medical' =>  /\b(health|medic)/i,
+    'History'        =>  /\b(hist)/i,
+    'Horror'         =>  /\b(horror)/i,
+    'HowTo'          =>  /\b(how|home|house|garden)/i,
+    'Misc'           =>  /\b(special|variety|info|collect)/i,
+    'News'           =>  /\b(news|current)/i,
+    'Reality'        =>  /\b(reality)/i,
+    'Romance'        =>  /\b(romance)/i,
+    'SciFi_Fantasy'  =>  /\b(fantasy|sci\\w*\\W*fi)/i,
+    'Science_Nature' =>  /\b(science|nature|environm)/i,
+    'Shopping'       =>  /\b(shop)/i,
+    'Soaps'          =>  /\b(soaps)/i,
+    'Spiritual'      =>  /\b(spirit|relig)/i,
+    'Sports'         =>  /\b(sport)/i,
+    'Talk'           =>  /\b(talk)/i,
+    'Travel'         =>  /\b(travel)/i,
+    'War'            =>  /\b(war)/i,
+    'Western'        =>  /\b(west)/i
+  }
 
 end
 
