@@ -1,8 +1,9 @@
 Tvg::Application.routes.draw do
   get "schedule/index"
-  match "/schedule" => "schedule#index"
 
   get "schedule/show"
+
+  match "/schedule" => "schedule#schedule"
 
   get "schedule/test"
 

@@ -14,16 +14,21 @@ class ScheduleController < ApplicationController
                         session )
     param_defaults params
     get_data_for_time_span
+    respond_to do |format|
+      format.html
+      format.json { render json: @blockss }
+    end
   end
 
   def groupupdate
     SchedResource.ensure_config session
 
-    # @t1 = params[:t1]
-    # @t2 = params[:t2]
-    # @inc= params[:inc]
     param_defaults params
     get_data_for_time_span
+    respond_to do |format|
+      format.html
+      format.json { render json: @blockss }
+    end
   end
 
   def test
