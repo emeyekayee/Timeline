@@ -1,0 +1,6 @@
+maintainer        "Mike Cannon"
+maintainer_email  "michael.j.cannon@gmail.com"
+description       "Configures rails applications"
+version           "0.1"
+depends           "nginx"
+depends           "unicorn"
