@@ -12,11 +12,28 @@ class ScheduleController < ApplicationController
   def schedule
     SchedResource.send( params[:reset] ? :config_from_yaml : :ensure_config,
                         session )
+    # SchedResource.config_from_yaml if params[:reset]
+    # SchedResource.ensure_config session
+    # 
     param_defaults params
     get_data_for_time_span
     respond_to do |format|
       format.html
-      format.json { render json: @blockss }
+      format.json do
+
+        minTime = 2 ** 31
+        @blockss.each do |rsrc, blocks|
+          blocks.each do |block|
+            block.starttime =  block.starttime.to_i
+            block.endtime   =  block.endtime.to_i
+            minTime = block.starttime if block.starttime < minTime
+          end
+        end
+        @blockss['minTime'] = minTime
+        @blockss['inc'] = @inc
+
+        render json: @blockss
+      end
     end
   end
 

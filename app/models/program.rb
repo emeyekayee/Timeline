@@ -154,15 +154,23 @@ Program.define_attribute_methods()
 class Program < ActiveRecord::Base
   TZ_OFFSET = Time.now.gmt_offset     # => -25200 
   #--
+  # FIXME: Rather than alias_method_chain, just override the accessors
+  #
   # This fails across DST boundaries and requires restart.  It could 
   # be done better and is a hack due in part to an underlying problem
   # in how time is represented in the mythtv database.
   #++
   def starttime_with_local_tz()  
+    if starttime_without_local_tz.kind_of? Integer # For JSON.  We've already
+      return starttime_without_local_tz            # made this adjustment
+    end
     (starttime_without_local_tz - TZ_OFFSET).localtime 
   end
 
   def endtime_with_local_tz()
+    if endtime_without_local_tz.kind_of? Integer # For JSON.  We've already
+      return endtime_without_local_tz            # made this adjustment
+    end
     (endtime_without_local_tz - TZ_OFFSET).localtime
   end
 

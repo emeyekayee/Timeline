@@ -27,6 +27,7 @@ group :development, :test do
   gem 'rb-readline'
   gem 'ffi', "~> 1.0.11"
   gem 'sys-uname', "~> 0.9.0"
+  gem 'binding_of_caller'
 end
 
 group :development do
