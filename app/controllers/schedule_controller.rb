@@ -1,7 +1,5 @@
 class ScheduleController < ApplicationController
   def index
-    schedule
-    render :action => 'schedule'
   end
 
   def show
@@ -16,6 +14,9 @@ class ScheduleController < ApplicationController
     # SchedResource.ensure_config session
     # 
     param_defaults params
+
+    Rails.logger.debug "\n@t1= #{hm_ampm(@t1)}  @t2= #{hm_ampm(@t2)}\n"
+
     get_data_for_time_span
     respond_to do |format|
       format.html
@@ -30,6 +31,8 @@ class ScheduleController < ApplicationController
           end
         end
         @blockss['minTime'] = minTime
+        @blockss['t1'] = @t1.to_i
+        @blockss['t2'] = @t2.to_i
         @blockss['inc'] = @inc
 
         render json: @blockss
@@ -57,6 +60,12 @@ class ScheduleController < ApplicationController
 
   
   private
+  
+  # HH:MMam(pm)
+  def hm_ampm(t)
+    t = Time.at(t) if t.kind_of? Numeric
+    Time.at(t).strftime("%I:%M%p").downcase.sub(/^0/,'')
+  end
   
   def param_defaults(p = {})
     @t1 = p[:t1] || time_default

@@ -1,14 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html  lang="en" ng-app="tvApp">
 <head>
-  <title>Tvg <%= controller.action_name %></title>
+  <meta charset="utf-8">
+  <title>Ang-Rails Tv <%= controller.action_name %></title>
   <%= stylesheet_link_tag    "application", :media => "all" %>
   <%= javascript_include_tag "application" %>
   <%= csrf_meta_tags %>
 </head>
 <body>
+  
+  <div class="container"> <!-- -fluid -->
 
-<%= yield %>
+    <%= yield %>
+
+    <!--Body content-->
+    <div class="row"> <!-- -fluid -->
+      <div >          <!-- class="span4" -->
+      </div>
+
+      <div > <!-- class="span10" -->
+
+        <div id='scrolling-container'
+             style="overflow-x: scroll; padding-bottom: 3px;
+                    border: 1px solid red; width: 750px;
+                    position: relative; left: 75px"
+             ng-controller="ResourceListCtrl">      <!--  -->
+
+          <div style="overflow: hidden; margin: 1px; 
+                      width: 10000px;
+                      position: relative;"> <!-- ; border: 1px solid yellow -->
+
+            <div ng-controller="UseBlockListCtrl"
+                 ng-repeat="resource in resources"
+                 class="rsrcRow {{ resource | rowKind }}row">
+
+              <!-- Resource label goes here. -->
+              <div class="timespan">  
+                <div ng-repeat="block in use_blocks" valign="top"
+                      class="{{ block.css_classes }} blockdiv"
+                      style="{{ block | bwidth }} ">
+                  <a href="">{{ block.label }}<br/>
+                             {{ block.sub_label }}</a>
+                  <!-- ~/aws-tv/app/views/schedule/_block_internal.html.erb -->
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+
+  </div>
 
 </body>
 </html>
