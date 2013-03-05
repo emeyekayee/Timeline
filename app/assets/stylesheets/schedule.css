@@ -1,6 +1,6 @@
-/* program_grid.css
+/* schedule.css
    Classes for ruby/rails/ajax tv-schedule
-    - Mike Cannon (Wed Jan 11 '06)
+    - Mike Cannon (Mon Mar 4 '13) 
                                        (http://github.com/emeyekayee/Timeline)
                                        (michael.j.cannon@gmail.com)
    NOTE: Parts of this file borrowed (as noted) from mythweb, part of
@@ -70,16 +70,25 @@ a:visited             { color: white; text-decoration: none;}
                       }
 
 
-.blockdiv.timeblock.amTimeblock  { background-color: #33669E; }
-.blockdiv.timeblock.pmTimeblock  { background-color: #194B82; }
+.blockdiv.amTimeblock  { background-color: #33669E; }
+.blockdiv.pmTimeblock  { background-color: #194B82; }
+
+
 
 /* .Timeheaderrow */
 /* .Timeheaderrow */
                     
 .TimeheaderHourrow      { height:    22px;}
-.TimeheaderDayNightrow  { height:    22px;}
                                            
-.TimeheaderHourrow     .blockdiv  { height:   22px;}
+.TimeheaderHourrow .blockdiv  { 
+                          height:           22px;
+                          background-color: #265990; 
+                          text-align:       center; 
+                          padding:          2px;
+                          font-size:        14px;
+                        }
+
+.TimeheaderDayNightrow  { height:    22px;}
 .TimeheaderDayNightrow .blockdiv  { height:   22px;}
 
 .TimeheaderDayNightrow  .rsrclabel img 
@@ -111,40 +120,40 @@ a:visited             { color: white; text-decoration: none;}
 
 
 .Channelrow           { height:           36px;}
-.Channelrow .blockdiv { height:           36px;}
+.Channelrow .blockdiv { height:           32px;
+                        padding:          2px;
+                      }
 .Channelrow .rsrclabel img {                     /* "inherit" no go for IE  */
                         height:           36px;  
                         width:            56px;
                       }
 
 .timespan             { position:         absolute;
-                        left:             68px; 
+                        height:           32px;
+                        left:             0px;  /* WAS 68px, space for labels */
                       }
 
 
 .blockdiv             { position:         absolute;
                         border:           1px solid #002650;
-                        font-size:        12px;
-                      }
-
-.blockdiv.timeblock   { background-color: #265990; 
-                        text-align:       center; 
-                        font-size:        14px;
-                      }
-
-
-.blockclip            { position:         absolute; /* */
-                        left:             2px;
+                        font-size:        11px;
+                        line-height:      1.2;
                         white-space:      nowrap;
                         overflow:         hidden; 
                       }
 
-.multisched           { /* position:         absolute;   */
+/*
+.blockclip            { position:         absolute; 
+                        left:             2px;
+                      }
+
+.multisched           {
                         left:             10px;
                         border:           2px solid #336680;
                         padding-bottom:   4px;
                         color:            #ededed;
                       }
+ */
 
 /****************************************************************************/
 /* Styles for tooltips -- from 
