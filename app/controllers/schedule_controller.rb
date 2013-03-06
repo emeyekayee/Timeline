@@ -8,8 +8,8 @@ class ScheduleController < ApplicationController
   end
 
   def schedule
-    SchedResource.send( params[:reset] ? :config_from_yaml : :ensure_config,
-                        session )
+    meth = params[:reset] ? :config_from_yaml : :ensure_config
+    SchedResource.send( meth, session )
     # SchedResource.config_from_yaml if params[:reset]
     # SchedResource.ensure_config session
     # 
@@ -30,11 +30,10 @@ class ScheduleController < ApplicationController
             minTime = block.starttime if block.starttime < minTime
           end
         end
-        @blockss['minTime'] = minTime
-        @blockss['t1'] = @t1.to_i
-        @blockss['t2'] = @t2.to_i
-        @blockss['inc'] = @inc
-
+        @blockss['meta'] = {
+          rsrcs: @rsrcs, minTime: minTime, 
+          t1: @t1.to_i, t2: @t2.to_i, inc: @inc,
+        }
         render json: @blockss
       end
     end

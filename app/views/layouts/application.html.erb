@@ -8,34 +8,31 @@
   <%= csrf_meta_tags %>
 </head>
 <body>
-  
   <div class="container"> <!-- -fluid -->
 
     <%= yield %>
 
     <!--Body content-->
     <div class="row"> <!-- -fluid -->
-      <div >          <!-- class="span4" -->
+      <div> <!-- class="span4" --> </div>
+
+      <div id='resource-labels'>
       </div>
 
-      <div > <!-- class="span10" -->
+      <div style="display: inline-block;"> <!-- class="span10" -->
+        <div id='scrolling-container' ng-controller="ResourceListCtrl">
 
-        <div id='scrolling-container'
-             style="overflow-x: scroll; padding-bottom: 3px;
-                    border: 1px solid red; width: 750px;
-                    position: relative; left: 75px"
-             ng-controller="ResourceListCtrl">      <!--  -->
-
-          <div style="overflow: hidden; margin: 1px; 
-                      width: 10000px;
-                      position: relative;"> <!-- ; border: 1px solid yellow -->
+          <div style="overflow: hidden; margin: 1px;
+                      width: 10000px; position: relative;">
+            <!-- ; border: 1px solid yellow -->
+            <div id='current-time-cursor'> </div>
 
             <div ng-controller="UseBlockListCtrl"
                  ng-repeat="resource in resources"
                  class="rsrcRow {{ resource | rowKind }}row">
 
               <!-- Resource label goes here. -->
-              <div class="timespan">  
+              <div class="timespan">
                 <div ng-repeat="block in use_blocks" valign="top"
                       class="{{ block.css_classes }} blockdiv"
                       style="{{ block | bwidth }} ">
@@ -44,17 +41,15 @@
                   <!-- ~/aws-tv/app/views/schedule/_block_internal.html.erb -->
                 </div>
               </div>
-
             </div>
 
           </div>
 
-
         </div>
       </div>
+      <div id='scrollbar-hider'> </div>
+
     </div>
-
   </div>
-
 </body>
 </html>

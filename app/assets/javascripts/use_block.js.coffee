@@ -1,4 +1,4 @@
-class UseBlock
+class @UseBlock
   constructor: -> nil
 
   @minTime: 0
@@ -15,7 +15,7 @@ class UseBlock
     tag.split('_')[0]
 
 
-class ChannelUseBlock extends UseBlock
+class @ChannelUseBlock extends UseBlock
   constructor: -> nil
 
   @process: (prog) ->
@@ -101,7 +101,7 @@ class ChannelUseBlock extends UseBlock
 
 
 
-class TimeheaderDayNightUseBlock extends UseBlock
+class @TimeheaderDayNightUseBlock extends UseBlock
   constructor: -> nil
 
   @process: (block) ->
@@ -127,7 +127,7 @@ class TimeheaderDayNightUseBlock extends UseBlock
     block.css_classes = classes
 
 
-class TimeheaderHourUseBlock extends UseBlock
+class @TimeheaderHourUseBlock extends UseBlock
   constructor: -> nil
 
   @process: (block) ->
@@ -151,10 +151,3 @@ class TimeheaderHourUseBlock extends UseBlock
     block.css_classes = 'TimeheaderHourrow'
 
 
-# This, until I sort out module include/load.
-root = window || global
-
-root.UseBlock = UseBlock
-root.ChannelUseBlock = ChannelUseBlock
-root.TimeheaderHourUseBlock = TimeheaderHourUseBlock
-root.TimeheaderDayNightUseBlock = TimeheaderDayNightUseBlock

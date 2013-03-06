@@ -2,35 +2,58 @@
 
 /* Controllers */
 
-function ResourceListCtrl($scope, $http) {
-  $scope.resources = [];
+function ux_time_now() {
+  return new Date().valueOf() / 1000
+}
 
-//$http.get('http://localhost:3000/schedule.json').
+function ux_time_offset(uxt) {
+  return uxt - UseBlock.minTime
+}
+
+function ux_time_offset_pix(uxt) {
+  return UseBlock.scale( ux_time_offset(uxt) )
+}
+
+function scroll_to_ux_time(uxt) {
+  var sc = $('#scrolling-container')
+  sc.scrollLeft( ux_time_offset_pix(uxt) )
+}
+
+function scroll_to_t1() {
+  scroll_to_ux_time( UseBlock.t1 )
+}
+
+function set_time_cursor() {
+  var cursor = $('#current-time-cursor');
+  var now_offset = ux_time_offset_pix( ux_time_now() );
+  cursor.css( 'left',  now_offset + 'px' )
+  setTimeout( set_time_cursor, 15 * 1000 )
+}
+
+
+function ResourceListCtrl($scope, $http) {
   $http.get('/schedule.json').
 
     success( function(data) {
-      var param_names = ['minTime', 'inc', 't1', 't2'];
-      param_names.forEach( function(name) {
-        UseBlock[name] = data[name]
-        console.log
-        delete data[name]
+      Object.keys(data.meta).forEach( function(name) {
+        UseBlock[name] = data.meta[name]
       })
-      console.log( "(t1 - minTime)-to-pixels: " + 
-                   UseBlock.scale(UseBlock.t1 - UseBlock.minTime) )
-
+      delete data.meta
+        
+      window.json_data = data           // Park this here until we consume it.
       
-      setTimeout( function() {
-        var sc = $('#scrolling-container')
-        sc.scrollLeft( UseBlock.scale(UseBlock.t1 - UseBlock.minTime) )
-      }, 300 );
+      var tags = [];
+      UseBlock.rsrcs.forEach( function(rsrc) {
+        tags.push( rsrc.tag )
+      })
+      $scope.resources = tags
 
-      window.json_data = data
-
-      $scope.resources = Object.keys(data)
+      setTimeout( scroll_to_t1, 100 )
+      setTimeout( set_time_cursor, 1000 )
     }). // success
 
     error( function(data, status, headers, config) {
-      console.log( '\nstatus: ' + status + 
+      console.log( '\nstatus: ' + status +
                    '\nheaders(): ' + headers() +
                    '\nconfig: ' + config
                   )
@@ -40,12 +63,12 @@ function ResourceListCtrl($scope, $http) {
 }
 
 
-var process_fns = { 
-  TimeheaderDayNight: angular.bind(TimeheaderDayNightUseBlock, 
+var process_fns = {
+  TimeheaderDayNight: angular.bind(TimeheaderDayNightUseBlock,
                                    TimeheaderDayNightUseBlock.process),
-  TimeheaderHour:     angular.bind(TimeheaderHourUseBlock,     
+  TimeheaderHour:     angular.bind(TimeheaderHourUseBlock,
                                    TimeheaderHourUseBlock.process),
-  Channel:            angular.bind(ChannelUseBlock,            
+  Channel:            angular.bind(ChannelUseBlock,
                                    ChannelUseBlock.process)
 }
 
@@ -53,8 +76,8 @@ var process_fns = {
 
 function UseBlockListCtrl($scope) {
   if (! Array.isArray($scope.use_blocks)) $scope.use_blocks = [];
-    
-  var 
+
+  var
     resourceTag = $scope.resource,
     blocks      = window.json_data[ resourceTag ],
     rsrc_kind   = resourceTag.split('_')[0],
