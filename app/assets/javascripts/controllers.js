@@ -42,11 +42,14 @@ function ResourceListCtrl($scope, $http) {
         
       window.json_data = data           // Park this here until we consume it.
       
+      var rsrcs = UseBlock.rsrcs        // This defines the order of rows
+      $scope.rsrcs = rsrcs
+      
       var tags = [];
-      UseBlock.rsrcs.forEach( function(rsrc) {
+      rsrcs.forEach( function(rsrc) {
         tags.push( rsrc.tag )
       })
-      $scope.resources = tags
+      $scope.resources = tags           // resources here is a misnomer XXXX
 
       setTimeout( scroll_to_t1, 100 )
       setTimeout( set_time_cursor, 1000 )
@@ -81,7 +84,7 @@ function UseBlockListCtrl($scope) {
     resourceTag = $scope.resource,
     blocks      = window.json_data[ resourceTag ],
     rsrc_kind   = resourceTag.split('_')[0],
-    process_fn   = process_fns[rsrc_kind];
+    process_fn  = process_fns[rsrc_kind];
 
   if (! process_fn) {
     console.log( 'Skipping use block with tag ' + resourceTag )
@@ -91,4 +94,9 @@ function UseBlockListCtrl($scope) {
   blocks.forEach( function(block) {
     $scope.use_blocks.push( process_fn(block.blk) )
   });
+}
+
+function LabelListCtrl($scope) {
+  var tag = $scope.resource
+  UseBlock.rsrcs[tag]  
 }

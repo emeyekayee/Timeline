@@ -1,6 +1,6 @@
 /* schedule.css
    Classes for ruby/rails/ajax tv-schedule
-    - Mike Cannon (Mon Mar 4 '13) 
+    - Mike Cannon (Mon Mar 4 '13)
                                        (http://github.com/emeyekayee/Timeline)
                                        (michael.j.cannon@gmail.com)
    NOTE: Parts of this file borrowed (as noted) from mythweb, part of
@@ -14,7 +14,7 @@ body {
     padding:          0;
     font-size:        11pt;
     font-family:      Arial, Helvetica, sans-serif;
-    background-color: #002650; 
+    background-color: #002650;
  /* color:            #ededed; */
 }
 
@@ -30,64 +30,103 @@ a:visited               { color: white;  text-decoration: none;}
                           position:         absolute;
                         }
 
-#scrolling-container    { overflow-x:       scroll;   
+#scrolling-container    { overflow-x:       scroll;
                           padding-bottom:   3px;
+                          vertical-align:   top;
                           width:            750px;
                           border:           1px solid red;
-                        }   
+                        }
 
-#resource-labels        { width:            60px;
-                          height:           515px; /* tmp... */
-                          background-color: #444;
+#positioned-container   { overflow:         hidden;
+                          margin:           1px;
+                          width:            10000px;
+                          position:         relative;
+                        }
+
+#labels-container       { width:            60px;
+                          vertical-align:   top;
                           display:          inline-block;
                         }
 
+#timespans-container    { vertical-align:   top;
+                          display:          inline-block;
+                        }
 
-                        /* per #resource-labels + #scrolling-container */
-#scrollbar-hider        { width:            816px; 
-                          height:           20px;
+#resource-labels        { position:         relative;
+                          left:             5px;
+                          background-color: #002650;
+                          border:           1px solid red;
+                        }
+
+
+#scrollbar-hider        { width:            811px;   /* per #resource-labels + */
+                          height:           20px;    /* #scrolling-container   */
                           background-color: #002650;
                           position:         relative;
                           top:              -20px;
+                          left:             5px;
                           border-top:       1px solid red;
                         }
 
 .rsrcRow                { display:          block;
-                          margin:           2px;
+                          margin:           1px;
+                          margin-left:      0px;
                         }
 
-
 .rsrclabel              { position:         absolute;
-                          width:            56px;                
-                          border:           1px solid #002650; 
+                          width:            56px;
+                          border:           1px solid #002650;
                           background-color: transparent; /* #265990 */
                           font-weight:      bold;
-                        }            
+                          text-align:       center;
+                          color:            white;
+                        }
 
 .rsrclabel img          { position:         absolute;
                           left:             0;
                           z-index:          0;
-                          background:       #aaa
-                        } 
+                          background-color: #002650;
+                        }
 
-.rsrclabel div          { position:         absolute;
-                          margin-top:       3px;
-                          background-color: transparent; /* #265990 */
-                          text-align:       center; 
+.rsrclabel > .label-text {
+                          position:         absolute;
+                          z-index:          2;
+                          color:            #fff;
+                          text-align:       center;
+                          width:            56px;
+                        }
+
+.rsrclabel > div.filter { position:         absolute;
+                          /* margin-top:       3px; */
+                          background-color: #002650;
                           width:            56px;
                           z-index:          1;
+                          opacity:          0.5;
                         }
+
+.Channelrow .rsrclabel > div.filter {
+                          height:           36px;
+                        }
+
+.TimeheaderDayNightrow .rsrclabel  > div.filter {
+                          height:           22px;
+                        }
+
+.TimeheaderHourrow .rsrclabel  > div.filter {
+                          height:           22px;
+                        }
+
 
 .Channelrow .rsrclabel div
                         { font-size:        16pt; }
 
-.ampmLeft               { float:            left;  
-                          margin-top:       6px;       
+.ampmLeft               { float:            left;
+                          margin-top:       6px;
                           font-size:        80%;
                           color:            #C0D0E0;
                         }
-.ampmRight              { float:            right; 
-                          margin-top:       6px;       
+.ampmRight              { float:            right;
+                          margin-top:       6px;
                           font-size:        80%;
                           color:            #C0D0E0;
                         }
@@ -103,13 +142,13 @@ a:visited               { color: white;  text-decoration: none;}
 
 /* .Timeheaderrow */
 /* .Timeheaderrow */
-                    
+
 .TimeheaderHourrow      { height:    22px;}
-                                           
-.TimeheaderHourrow .blockdiv  { 
+
+.TimeheaderHourrow .blockdiv  {
                           height:           22px;
-                          background-color: #265990; 
-                          text-align:       center; 
+                          background-color: #265990;
+                          text-align:       center;
                           padding:          2px;
                           font-size:        14px;
                         }
@@ -117,13 +156,13 @@ a:visited               { color: white;  text-decoration: none;}
 .TimeheaderDayNightrow  { height:    22px;}
 .TimeheaderDayNightrow .blockdiv  { height:   22px;}
 
-.TimeheaderDayNightrow .rsrclabel img 
+.TimeheaderDayNightrow .rsrclabel img
                       {                        /* "inherit" no go for IE  */
                         height:           22px;
                         width:            56px;
                       }
 
-.TimeheaderHourrow .rsrclabel img 
+.TimeheaderHourrow .rsrclabel img
                       {                        /* "inherit" no go for IE  */
                         height:           22px;
                         width:            56px;
@@ -132,14 +171,14 @@ a:visited               { color: white;  text-decoration: none;}
 
 .TimeheaderDayNightrow div.rsrclabel
                       {
-                        color:            #D0E0F0;
+                        /* color:            #D0E0F0; */
                         height:           22px;
                         width:            56px;
                       }
 
 .TimeheaderHourrow div.rsrclabel
                       {
-                        color:            #D0E0F0;
+                        /* color:            #D0E0F0; */
                         height:           22px;
                         width:            56px;
                       }
@@ -150,7 +189,7 @@ a:visited               { color: white;  text-decoration: none;}
                         padding:          2px;
                       }
 .Channelrow .rsrclabel img {                     /* "inherit" no go for IE  */
-                        height:           36px;  
+                        height:           36px;
                         width:            56px;
                       }
 
@@ -165,11 +204,11 @@ a:visited               { color: white;  text-decoration: none;}
                         font-size:        11px;
                         line-height:      1.2;
                         white-space:      nowrap;
-                        overflow:         hidden; 
+                        overflow:         hidden;
                       }
 
 /*
-.blockclip            { position:         absolute; 
+.blockclip            { position:         absolute;
                         left:             2px;
                       }
 
@@ -182,7 +221,7 @@ a:visited               { color: white;  text-decoration: none;}
  */
 
 /****************************************************************************/
-/* Styles for tooltips -- from 
+/* Styles for tooltips -- from
  *  /r/FSRV/PROJECTS/mythweb/themes/Default/style.css
  */
 
@@ -191,7 +230,7 @@ a:visited               { color: white;  text-decoration: none;}
 div.tt                { position:     fixed;
                         opacity:      0.85; /* Not IE, (Chrome? Opera?)   */
                         color:        #ffd;
-                        text-align:   left; 
+                        text-align:   left;
                         font-size:    8pt;
                         font-family:  Arial, Helvetica, sans-serif;
                         z-index:      10;
@@ -205,7 +244,7 @@ dl.detail_list        { background:    #111;
                         font-size:     11pt;
                         margin:        .125em;
                         width:         300px;
-                        border-radius: 12px; 
+                        border-radius: 12px;
              /*         border-radius: 24px / 12px; */
              /*         border-radius: 48px / 24px; */
              /* -webkit-border-radius: 12px; */
@@ -233,7 +272,7 @@ dl.detail_list dd img { height:       12px; /* "inherit" no go for IE  */
 
 .starsclip            { display:      inline-block;
                         white-space:  nowrap;
-                        overflow:     hidden; 
+                        overflow:     hidden;
                        }
 
 /****************************************************************************/

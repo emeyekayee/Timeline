@@ -14,42 +14,56 @@
 
     <!--Body content-->
     <div class="row"> <!-- -fluid -->
-      <div> <!-- class="span4" --> </div>
+      <div ng-controller="ResourceListCtrl"> 
 
-      <div id='resource-labels'>
-      </div>
+        <div id="labels-container">
+          <div id="resource-labels">
+            <div ng-controller="LabelListCtrl"
+                 ng-repeat="rsrc in rsrcs"
+                 class="rsrcRow {{ rsrc.tag | rowKind }}row">
 
-      <div style="display: inline-block;"> <!-- class="span10" -->
-        <div id='scrolling-container' ng-controller="ResourceListCtrl">
+              <div class="rsrclabel">
+                <img src="/assets/{{ rsrc.label }}.jpg" title="{{ rsrc.title }}" />
+                <div class="filter"> </div>
+                <div class="label-text">{{ rsrc.label }}</div>
+              </div>
 
-          <div style="overflow: hidden; margin: 1px;
-                      width: 10000px; position: relative;">
-            <!-- ; border: 1px solid yellow -->
-            <div id='current-time-cursor'> </div>
+            </div>
+          </div>
+        </div>
 
-            <div ng-controller="UseBlockListCtrl"
-                 ng-repeat="resource in resources"
-                 class="rsrcRow {{ resource | rowKind }}row">
+        <div id="timespans-container">
+          <div id="scrolling-container">
 
-              <!-- Resource label goes here. -->
-              <div class="timespan">
-                <div ng-repeat="block in use_blocks" valign="top"
-                      class="{{ block.css_classes }} blockdiv"
-                      style="{{ block | bwidth }} ">
-                  <a href="">{{ block.label }}<br/>
-                             {{ block.sub_label }}</a>
-                  <!-- ~/aws-tv/app/views/schedule/_block_internal.html.erb -->
+            <div id="positioned-container">
+
+              <div id="current-time-cursor"> </div>
+
+              <div ng-controller="UseBlockListCtrl"
+                   ng-repeat="resource in resources"
+                   class="rsrcRow {{ resource | rowKind }}row">
+
+                <div class="timespan">
+                  <div ng-repeat="block in use_blocks" valign="top"
+                        class="{{ block.css_classes }} blockdiv"
+                        style="{{ block | bwidth }} ">
+                    <a href="">{{ block.label }}<br/>
+                               {{ block.sub_label }}</a>
+                    <!-- ~/aws-tv/app/views/schedule/_block_internal.html.erb -->
+                  </div>
                 </div>
               </div>
+
             </div>
 
           </div>
-
         </div>
-      </div>
-      <div id='scrollbar-hider'> </div>
+              
+        <div id="scrollbar-hider"> </div>
 
+      </div> <!-- end ResourceiLstCtrl -->
     </div>
+
   </div>
 </body>
 </html>
