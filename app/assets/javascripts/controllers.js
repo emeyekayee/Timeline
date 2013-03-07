@@ -7,11 +7,11 @@ function ux_time_now() {
 }
 
 function ux_time_offset(uxt) {
-  return uxt - UseBlock.minTime
+  return uxt - UseBlock.baseTime
 }
 
 function ux_time_offset_pix(uxt) {
-  return UseBlock.scale( ux_time_offset(uxt) )
+  return UseBlock.secs_to_pix( ux_time_offset(uxt) )
 }
 
 function scroll_to_ux_time(uxt) {
@@ -30,41 +30,64 @@ function set_time_cursor() {
   setTimeout( set_time_cursor, 15 * 1000 )
 }
 
-
-function ResourceListCtrl($scope, $http) {
-  $http.get('/schedule.json').
-
-    success( function(data) {
-      Object.keys(data.meta).forEach( function(name) {
-        UseBlock[name] = data.meta[name]
-      })
-      delete data.meta
-        
-      window.json_data = data           // Park this here until we consume it.
-      
-      var rsrcs = UseBlock.rsrcs        // This defines the order of rows
-      $scope.rsrcs = rsrcs
-      
-      var tags = [];
-      rsrcs.forEach( function(rsrc) {
-        tags.push( rsrc.tag )
-      })
-      $scope.resources = tags           // resources here is a misnomer XXXX
-
-      setTimeout( scroll_to_t1, 100 )
-      setTimeout( set_time_cursor, 1000 )
-    }). // success
-
-    error( function(data, status, headers, config) {
-      console.log( '\nstatus: ' + status +
-                   '\nheaders(): ' + headers() +
-                   '\nconfig: ' + config
-                  )
-      console.debug( data['Channel_737'] )
-    }) // error
-    return null;
+function ux_time_of_pix(x) {
+  return UseBlock.baseTime + UseBlock.pix_to_secs(x)
 }
 
+function build_url (t1, t2, inc) {
+  var url = '/schedule.json'
+  if (inc) url = '/schedule.json'
+  if (t1 || t2 || inc) {url += '?t1=' + t1 + '&t2=' + t2 + '&inc=' + inc}
+  return url
+}
+
+function init_resources($scope) {
+  var rsrcs = UseBlock.rsrcs      // This defines the order of rows
+  $scope.rsrcs = rsrcs
+
+  var tags = [];
+  rsrcs.forEach( function(rsrc) {
+    tags.push( rsrc.tag )
+  })
+  $scope.resources = tags         // resources here is a misnomer XXXX
+
+  setTimeout( scroll_to_t1, 100 )
+  setTimeout( set_time_cursor, 1000 )
+
+}
+
+function data_adder_factory($scope, $http) {
+  return function(t1, t2, inc) {
+    $http.get( build_url(t1, t2, inc) ).
+
+      success( function(data) {
+        Object.keys(data.meta).forEach( function(name) {
+          UseBlock[name] = data.meta[name]
+        })
+        UseBlock.baseTime = UseBlock.baseTime  || data.meta['minTime']
+
+        window.json_data = data   // Park this here until we consume it.
+
+        if (! inc) { init_resources($scope) }
+        // UseBlock.merge_metadata()
+      }). // success
+
+      error( function(data, status, headers, config) {
+        console.log( '\nstatus: ' + status +
+                     '\nheaders(): ' + headers() +
+                     '\nconfig: ' + config
+                    )
+        console.debug( data['Channel_737'] )
+      }) // error
+    return null;
+  }
+}
+
+function ResourceListCtrl($scope, $http) {
+  window.get_data = data_adder_factory($scope, $http)
+  get_data();
+  return null;
+}
 
 var process_fns = {
   TimeheaderDayNight: angular.bind(TimeheaderDayNightUseBlock,
@@ -74,7 +97,6 @@ var process_fns = {
   Channel:            angular.bind(ChannelUseBlock,
                                    ChannelUseBlock.process)
 }
-
 
 
 function UseBlockListCtrl($scope) {
@@ -92,11 +114,15 @@ function UseBlockListCtrl($scope) {
   }
 
   blocks.forEach( function(block) {
+    if (UseBlock.inc == 'lo') {
+      console.log('Implement me !!! (inc=lo)')
+      return null
+    }
     $scope.use_blocks.push( process_fn(block.blk) )
   });
 }
 
 function LabelListCtrl($scope) {
   var tag = $scope.resource
-  UseBlock.rsrcs[tag]  
+  UseBlock.rsrcs[tag]
 }

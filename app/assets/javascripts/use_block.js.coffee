@@ -1,15 +1,25 @@
 class @UseBlock
   constructor: -> nil
 
-  @minTime: 0
-
-  @scale: (seconds) ->
-    pix = seconds * 750 / (3 * 3600)  # Matching width of #scrolling-container
+  @baseTime: 0
+  @timeWindow: (3 * 3600)
+  # Time range [@tlo..@thi] is where the DOM has data.
+  @tlo: null
+  @thi: null
+  @merge_metadata: ->
+    @tlo = Math.min @tlo, @meta.t1
+    @thi = Math.max @thi, @meta.t2
+  
+  @secs_to_pix: (seconds) ->
+    pix = seconds * 750 / @timeWindow # Matching width of #scrolling-container
     Math.round(pix * 100) / 100
 
+  @pix_to_secs: (pix) ->
+    Math.round(pix * @timeWindow  / 750)
+
   @bwidth: (block) ->
-    [s, e] = [block.starttime, block.endtime]
-    "left: #{@scale(s - @minTime)}px; width: #{@scale(e-s)-4}px;" # per margins
+    [s, e] = [block.starttime, block.endtime]             # per margins V
+    "left: #{@secs_to_pix(s - @baseTime)}px; width: #{@secs_to_pix(e-s)-4}px;" 
   
   @row_kind: (tag) ->  # may/may not belong here.
     tag.split('_')[0]

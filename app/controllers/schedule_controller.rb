@@ -12,10 +12,8 @@ class ScheduleController < ApplicationController
     SchedResource.send( meth, session )
     # SchedResource.config_from_yaml if params[:reset]
     # SchedResource.ensure_config session
-    # 
+    #
     param_defaults params
-
-    Rails.logger.debug "\n@t1= #{hm_ampm(@t1)}  @t2= #{hm_ampm(@t2)}\n"
 
     get_data_for_time_span
     respond_to do |format|
@@ -31,7 +29,7 @@ class ScheduleController < ApplicationController
           end
         end
         @blockss['meta'] = {
-          rsrcs: @rsrcs, minTime: minTime, 
+          rsrcs: @rsrcs, minTime: minTime,
           t1: @t1.to_i, t2: @t2.to_i, inc: @inc,
         }
         render json: @blockss
@@ -43,10 +41,26 @@ class ScheduleController < ApplicationController
     SchedResource.ensure_config session
 
     param_defaults params
+
     get_data_for_time_span
     respond_to do |format|
       format.html
-      format.json { render json: @blockss }
+      format.json do
+
+        baseTime = 2 ** 31
+        @blockss.each do |rsrc, blocks|
+          blocks.each do |block|
+            block.starttime =  block.starttime.to_i
+            block.endtime   =  block.endtime.to_i
+            baseTime = block.starttime if block.starttime < baseTime
+          end
+        end
+        @blockss['meta'] = {
+          rsrcs: @rsrcs, baseTime: baseTime,
+          t1: @t1.to_i, t2: @t2.to_i, inc: @inc,
+        }
+        render json: @blockss
+      end
     end
   end
 
@@ -57,15 +71,15 @@ class ScheduleController < ApplicationController
     config.keys.each{|key| @text << "\n#{key}:\n" + config[key].inspect}
   end
 
-  
+
   private
-  
+
   # HH:MMam(pm)
   def hm_ampm(t)
     t = Time.at(t) if t.kind_of? Numeric
     Time.at(t).strftime("%I:%M%p").downcase.sub(/^0/,'')
   end
-  
+
   def param_defaults(p = {})
     @t1 = p[:t1] || time_default
     @t2 = p[:t2] || @t1 + SchedResource.visible_time
@@ -73,8 +87,8 @@ class ScheduleController < ApplicationController
   end
 
   def time_default
-    z_offset = ActiveSupport::TimeZone['Pacific Time (US & Canada)'].utc_offset - 
-               Time.now.utc_offset   # Typically, for deployment to UTC server 
+    z_offset = ActiveSupport::TimeZone['Pacific Time (US & Canada)'].utc_offset -
+               Time.now.utc_offset   # Typically, for deployment to UTC server
 
     t_now = Time.now + z_offset
     t_now.change :min => (t_now.min/15) * 15
