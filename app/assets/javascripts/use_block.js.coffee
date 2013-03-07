@@ -3,12 +3,17 @@ class @UseBlock
 
   @baseTime: 0
   @timeWindow: (3 * 3600)
+
   # Time range [@tlo..@thi] is where the DOM has data.
   @tlo: null
   @thi: null
+
+  # Meta-data about most recent request
+  @meta: {}
+
   @merge_metadata: ->
-    @tlo = Math.min @tlo, @meta.t1
-    @thi = Math.max @thi, @meta.t2
+    @tlo = @tlo && Math.min( @tlo, @meta.t1 ) || @meta.t1
+    @thi = @thi && Math.max( @thi, @meta.t2 ) || @meta.t2
   
   @secs_to_pix: (seconds) ->
     pix = seconds * 750 / @timeWindow # Matching width of #scrolling-container

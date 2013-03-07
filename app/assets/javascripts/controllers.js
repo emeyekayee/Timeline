@@ -19,8 +19,8 @@ function scroll_to_ux_time(uxt) {
   sc.scrollLeft( ux_time_offset_pix(uxt) )
 }
 
-function scroll_to_t1() {
-  scroll_to_ux_time( UseBlock.t1 )
+function scroll_to_tlo() {
+  scroll_to_ux_time( UseBlock.tlo )
 }
 
 function set_time_cursor() {
@@ -42,18 +42,17 @@ function build_url (t1, t2, inc) {
 }
 
 function init_resources($scope) {
-  var rsrcs = UseBlock.rsrcs      // This defines the order of rows
-  $scope.rsrcs = rsrcs
+  var rsrcs = UseBlock.rsrcs = UseBlock.meta.rsrcs
+  $scope.rsrcs = rsrcs            // Defines the order of rows
 
   var tags = [];
   rsrcs.forEach( function(rsrc) {
     tags.push( rsrc.tag )
   })
-  $scope.resources = tags         // resources here is a misnomer XXXX
+  $scope.resources = tags         // 'resources' here is a misnomer XXXX
 
-  setTimeout( scroll_to_t1, 100 )
+  setTimeout( scroll_to_tlo, 100 )
   setTimeout( set_time_cursor, 1000 )
-
 }
 
 function data_adder_factory($scope, $http) {
@@ -62,7 +61,7 @@ function data_adder_factory($scope, $http) {
 
       success( function(data) {
         Object.keys(data.meta).forEach( function(name) {
-          UseBlock[name] = data.meta[name]
+          UseBlock.meta[name] = data.meta[name]
         })
         UseBlock.baseTime = UseBlock.baseTime  || data.meta['minTime']
 
@@ -70,6 +69,8 @@ function data_adder_factory($scope, $http) {
 
         if (! inc) { init_resources($scope) }
         UseBlock.merge_metadata()
+        $scope.tlo = UseBlock.tlo
+        $scope.thi = UseBlock.thi
       }). // success
 
       error( function(data, status, headers, config) {
@@ -77,7 +78,7 @@ function data_adder_factory($scope, $http) {
                      '\nheaders(): ' + headers() +
                      '\nconfig: ' + config
                     )
-        console.debug( data['Channel_737'] )
+        console.debug( data.meta )
       }) // error
     return null;
   }
