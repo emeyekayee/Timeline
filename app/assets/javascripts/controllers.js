@@ -69,7 +69,7 @@ function data_adder_factory($scope, $http) {
         window.json_data = data   // Park this here until we consume it.
 
         if (! inc) { init_resources($scope) }
-        // UseBlock.merge_metadata()
+        UseBlock.merge_metadata()
       }). // success
 
       error( function(data, status, headers, config) {
