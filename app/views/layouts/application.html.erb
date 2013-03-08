@@ -19,7 +19,7 @@
         <div id="labels-container">
           <div id="resource-labels">
             <div ng-controller="LabelListCtrl"
-                 ng-repeat="rsrc in rsrcs"
+                 ng-repeat="rsrc in rsrcList()"
                  class="rsrcRow {{ rsrc.tag | rowKind }}row">
 
               <div class="rsrclabel">

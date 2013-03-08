@@ -9,11 +9,3 @@ tvAppModule.filter('bwidth', function() {
 tvAppModule.filter('rowKind', function() {
   return angular.bind(UseBlock, UseBlock.row_kind);
 });
-
-
-
-
-
-
-
-

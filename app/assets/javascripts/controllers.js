@@ -98,6 +98,12 @@ function ResourceListCtrl($scope, $http) {
               blocks     = $scope.json_data[key]
           controller.add_blocks( controller, blocks )
         })
+      },
+
+      rsrcList: function() {
+        if ( Array.isArray($scope.rsrcs) ) return $scope.rsrcs
+        console.log("rsrcList returning [].")
+        return [];
       }
     });
 
@@ -118,21 +124,18 @@ var process_fns = {
 
 function UseBlockListCtrl($scope) {
 
-  $scope.add_blocks = function( $scope, blocks ) {
-    if (! $scope.process_fn) {
-      console.log( 'Skipping uses block with tag ' + resourceTag )
-      return null
+  $.extend( $scope, {
+    add_blocks: function ( $scope, blocks ) {
+      blocks.forEach( function(block) {
+        if (UseBlock.inc == 'lo') {
+          console.log('Implement me !!! (inc=lo)')
+          return null
+        }
+        $scope.use_blocks.push( $scope.process_fn(block.blk) )
+      });
+      console.log('Added blocks.')
     }
-
-    blocks.forEach( function(block) {
-      if (UseBlock.inc == 'lo') {
-        console.log('Implement me !!! (inc=lo)')
-        return null
-      }
-      $scope.use_blocks.push( $scope.process_fn(block.blk) )
-    });
-    console.log('Added blocks.')
-  };
+  });
 
 
   if (! Array.isArray($scope.use_blocks)) $scope.use_blocks = [];
@@ -142,6 +145,10 @@ function UseBlockListCtrl($scope) {
       rsrc_kind   = resourceTag.split('_')[0];
 
   $scope.process_fn = process_fns[rsrc_kind];
+  if (! $scope.process_fn) {
+    console.log( 'Skipping use blocks with tag ' + resourceTag )
+    return null
+  }
 
   $scope.use_block_list_Ctls[resourceTag] = $scope
 
