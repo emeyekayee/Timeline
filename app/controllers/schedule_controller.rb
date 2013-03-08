@@ -1,4 +1,14 @@
 class ScheduleController < ApplicationController
+
+  def min_time
+    @min_time ||= Program.order('starttime').limit(1)[0].starttime
+  end
+
+  def max_time
+    @max_time ||= Program.order('endtime DESC').limit(1)[0].endtime
+  end
+
+
   def index
   end
 
@@ -30,6 +40,7 @@ class ScheduleController < ApplicationController
         end
         @blockss['meta'] = {
           rsrcs: @rsrcs, minTime: minTime,
+          min_time: min_time, max_time: max_time,
           t1: @t1.to_i, t2: @t2.to_i, inc: @inc,
         }
         render json: @blockss

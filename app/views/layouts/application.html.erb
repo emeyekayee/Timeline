@@ -14,7 +14,7 @@
 
     <!--Body content-->
     <div class="row"> <!-- -fluid -->
-      <div ng-controller="ResourceListCtrl"> 
+      <div ng-controller="ResourceListCtrl" ng-click="more_data()"> 
 
         <div id="labels-container">
           <div id="resource-labels">
@@ -25,7 +25,7 @@
               <div class="rsrclabel">
                 <img src="/assets/{{ rsrc.label }}.jpg" title="{{ rsrc.title }}" />
                 <div class="filter"> </div>
-                <div class="label-text">{{ rsrc.label }}</div>
+                <div class="label-text">{{rsrc.label}}</div>
               </div>
 
             </div>
@@ -34,19 +34,18 @@
 
         <div id="timespans-container">
           <div id="scrolling-container">
-
             <div id="positioned-container">
-
               <div id="current-time-cursor"> </div>
 
-              <div ng-controller="UseBlockListCtrl"
-                   ng-repeat="resource in resources"
+              <div ng-repeat="resource in resources"
+                   ng-controller="UseBlockListCtrl"
                    class="rsrcRow {{ resource | rowKind }}row">
-
+                
                 <div class="timespan">
-                  <div ng-repeat="block in use_blocks" valign="top"
-                        class="{{ block.css_classes }} blockdiv"
-                        style="{{ block | bwidth }} ">
+                  <div ng-repeat="block in use_blocks" 
+                       ng-controller="UseBlockCtrl"  valign="top"
+                       class="{{ block.css_classes }} blockdiv"
+                       style="{{ block | bwidth }} ">
                     <a href="">{{ block.label }}<br/>
                                {{ block.sub_label }}</a>
                     <!-- ~/aws-tv/app/views/schedule/_block_internal.html.erb -->
@@ -55,7 +54,6 @@
               </div>
 
             </div>
-
           </div>
         </div>
               

@@ -14,6 +14,7 @@ class @UseBlock
   @merge_metadata: ->
     @tlo = @tlo && Math.min( @tlo, @meta.t1 ) || @meta.t1
     @thi = @thi && Math.max( @thi, @meta.t2 ) || @meta.t2
+    @inc = @meta.inc
   
   @secs_to_pix: (seconds) ->
     pix = seconds * 750 / @timeWindow # Matching width of #scrolling-container
