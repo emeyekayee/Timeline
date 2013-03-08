@@ -48,7 +48,7 @@ function ResourceListCtrl($scope, $http) {
         })
         $scope.use_block_list_Ctls = {} // Experimental
 
-        $scope.resources = tags         // 'resources' here is a misnomer XXXX
+        $scope.res_tags = tags
         setTimeout( scroll_to_tlo, 100 )
         setTimeout( set_time_cursor, 1000 )
       },
@@ -63,7 +63,7 @@ function ResourceListCtrl($scope, $http) {
 
             UseBlock.baseTime = UseBlock.baseTime  || UseBlock.meta['minTime']
 
-            window.json_data = data   // Park this here until we consume it.
+            $scope.json_data = data   // Park this here until we consume it.
 
             if (! inc) {
               $scope.init_resources($scope)
@@ -93,9 +93,9 @@ function ResourceListCtrl($scope, $http) {
       more_data: function() {
         $scope.get_data( UseBlock.thi, UseBlock.thi + 3 * 3600, 'hi' )
 
-        Object.keys(window.json_data).forEach( function(key) {
+        Object.keys($scope.json_data).forEach( function(key) {
           var controller = $scope.use_block_list_Ctls[key],
-              blocks     =  window.json_data[key]
+              blocks     =  $scope.json_data[key]
           controller.add_blocks( controller, blocks )
         })
       }
@@ -137,8 +137,8 @@ function UseBlockListCtrl($scope) {
 
   if (! Array.isArray($scope.use_blocks)) $scope.use_blocks = [];
 
-  var resourceTag = $scope.resource,
-      blocks      = window.json_data[ resourceTag ],
+  var resourceTag = $scope.res_tag,
+      blocks      = $scope.json_data[ resourceTag ],
       rsrc_kind   = resourceTag.split('_')[0];
 
   $scope.process_fn = process_fns[rsrc_kind];
@@ -154,6 +154,6 @@ function UseBlockCtrl($scope) {
 }
 
 function LabelListCtrl($scope) {
-  var tag = $scope.resource
+  var tag = $scope.res_tag
   UseBlock.rsrcs[tag] // Huh?
 }

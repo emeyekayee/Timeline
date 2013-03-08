@@ -37,9 +37,9 @@
             <div id="positioned-container">
               <div id="current-time-cursor"> </div>
 
-              <div ng-repeat="resource in resources"
+              <div ng-repeat="res_tag in res_tags"
                    ng-controller="UseBlockListCtrl"
-                   class="rsrcRow {{ resource | rowKind }}row">
+                   class="rsrcRow {{ res_tag | rowKind }}row">
                 
                 <div class="timespan">
                   <div ng-repeat="block in use_blocks" 
