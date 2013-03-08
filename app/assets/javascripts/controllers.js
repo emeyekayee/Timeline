@@ -38,17 +38,17 @@ function ux_time_of_pix(x) {
 function ResourceListCtrl($scope, $http) {
   $.extend( $scope,
     {
-      init_resources: function ($scope) {
+      init_resources: function () {
         var rsrcs = UseBlock.rsrcs = UseBlock.meta.rsrcs
-
         $scope.rsrcs = rsrcs            // Define the order of rows:
-        var tags = [];
-        rsrcs.forEach( function(rsrc) {
-          tags.push( rsrc.tag )
-        })
-        $scope.use_block_list_Ctls = {} // Experimental
+        $scope.res_tags = [];
 
-        $scope.res_tags = tags
+        rsrcs.forEach( function(rsrc) {
+          $scope.res_tags.push( rsrc.tag )
+        })
+
+        $scope.use_block_list_Ctls = {} // To access lower-level scopes later on
+
         setTimeout( scroll_to_tlo, 100 )
         setTimeout( set_time_cursor, 1000 )
       },
@@ -95,7 +95,7 @@ function ResourceListCtrl($scope, $http) {
 
         Object.keys($scope.json_data).forEach( function(key) {
           var controller = $scope.use_block_list_Ctls[key],
-              blocks     =  $scope.json_data[key]
+              blocks     = $scope.json_data[key]
           controller.add_blocks( controller, blocks )
         })
       }
