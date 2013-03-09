@@ -87,17 +87,17 @@ function ResourceListCtrl($scope, $http) {
         return $http.get( $scope.build_url(t1, t2, inc) ).
 
           success( function(data) {
-            UseBlock.meta = data.meta
-            delete data.meta
 
-            UseBlock.baseTime = UseBlock.baseTime  || UseBlock.meta['minTime']
+            // UseBlock.meta = data.meta
+
+            UseBlock.merge_metadata(data)
+            delete data.meta
 
             $scope.json_data = data   // Park this here until we consume it.
 
             if (! inc) {
               $scope.init_resources($scope)
             }
-            UseBlock.merge_metadata()
           }). // success
 
           error( function(data, status, headers, config) {

@@ -11,10 +11,14 @@ class @UseBlock
   # Meta-data about most recent request
   @meta: {}
 
-  @merge_metadata: ->
+  @merge_metadata: (data) ->
+    @meta = data.meta
+    @baseTime ||= (@meta['minTime'] - @timeWindow * 8)
     @tlo = @tlo && Math.min( @tlo, @meta.t1 ) || @meta.t1
     @thi = @thi && Math.max( @thi, @meta.t2 ) || @meta.t2
     @inc = @meta.inc
+
+            
   
   # Ignoring @baseTime offset
   @secs_to_pix_scale: (seconds) ->
