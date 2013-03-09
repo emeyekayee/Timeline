@@ -102,7 +102,6 @@ function ResourceListCtrl($scope, $http) {
 
       rsrcList: function() {
         if ( Array.isArray($scope.rsrcs) ) return $scope.rsrcs
-        console.log("rsrcList returning [].")
         return [];
       }
     });
@@ -133,7 +132,6 @@ function UseBlockListCtrl($scope) {
         }
         $scope.use_blocks.push( $scope.process_fn(block.blk) )
       });
-      console.log('Added blocks.')
     }
   });
 

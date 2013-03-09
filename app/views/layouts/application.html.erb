@@ -8,7 +8,7 @@
   <%= csrf_meta_tags %>
 </head>
 <body>
-  <div class="container"> <!-- -fluid -->
+  <div class="container">
 
     <%= yield %>
 
@@ -23,7 +23,7 @@
                  class="rsrcRow {{ rsrc.tag | rowKind }}row">
 
               <div class="rsrclabel">
-                <img src="/assets/{{ rsrc.label }}.jpg" title="{{ rsrc.title }}" />
+                <img ng-src="/assets/{{ rsrc.label }}.jpg" title="{{ rsrc.title }}" />
                 <div class="filter"> </div>
                 <div class="label-text">{{rsrc.label}}</div>
               </div>
