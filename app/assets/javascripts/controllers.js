@@ -87,17 +87,11 @@ function ResourceListCtrl($scope, $http) {
         return $http.get( $scope.build_url(t1, t2, inc) ).
 
           success( function(data) {
-
-            // UseBlock.meta = data.meta
-
             UseBlock.merge_metadata(data)
             delete data.meta
-
             $scope.json_data = data   // Park this here until we consume it.
 
-            if (! inc) {
-              $scope.init_resources($scope)
-            }
+             if (! inc) { $scope.init_resources($scope) }
           }). // success
 
           error( function(data, status, headers, config) {
@@ -116,36 +110,28 @@ function ResourceListCtrl($scope, $http) {
         return url
       },
 
-      more_data: function() {
+      rq_data: function(t1, t2, inc) {
         if (! $scope.busy ) {
           $scope.busy = true;
-          $scope.get_data( UseBlock.thi, UseBlock.thi + 3 * 3600, 'hi' ).
+          $scope.get_data( t1, t2, inc ).
             success( function(data) {
               Object.keys($scope.json_data).forEach( function(key) {
                 var controller = $scope.use_block_list_Ctls[key],
                     blocks     = $scope.json_data[key]
                 controller.add_blocks( controller, blocks )
               })
-
+              
             }); // errors handled above in get_data
           $scope.busy = false;
         }
       },
+      
+      more_data: function() {
+          $scope.rq_data( UseBlock.thi, UseBlock.thi + 3 * 3600, 'hi' )
+      },
 
       less_data: function() {
-        if (! $scope.busy ) {
-          $scope.busy = true;
-          $scope.get_data( UseBlock.tlo - 3 * 3600, UseBlock.tlo, 'lo' ).
-            success( function(data) {
-              Object.keys($scope.json_data).forEach( function(key) {
-                var controller = $scope.use_block_list_Ctls[key],
-                    blocks     = $scope.json_data[key]
-                controller.add_blocks( controller, blocks )
-              })
-
-            }); // errors handled above in get_data
-          $scope.busy = false;
-        }
+          $scope.rq_data( UseBlock.tlo - 3 * 3600, UseBlock.tlo, 'lo' )
       },
 
       rsrcList: function() {
