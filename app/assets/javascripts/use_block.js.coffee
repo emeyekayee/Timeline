@@ -16,16 +16,17 @@ class @UseBlock
     @thi = @thi && Math.max( @thi, @meta.t2 ) || @meta.t2
     @inc = @meta.inc
   
-  @secs_to_pix: (seconds) ->
+  # Ignoring @baseTime offset
+  @secs_to_pix_scale: (seconds) ->
     pix = seconds * 750 / @timeWindow # Matching width of #scrolling-container
     Math.round(pix * 100) / 100
 
   @pix_to_secs: (pix) ->
-    Math.round(pix * @timeWindow  / 750)
+    @baseTime + Math.round(pix * @timeWindow  / 750)
 
   @bwidth: (block) ->
     [s, e] = [block.starttime, block.endtime]             # per margins V
-    "left: #{@secs_to_pix(s - @baseTime)}px; width: #{@secs_to_pix(e-s)-4}px;" 
+    "left: #{@secs_to_pix_scale(s - @baseTime)}px; width: #{@secs_to_pix_scale(e-s)-4}px;" 
   
   @row_kind: (tag) ->  # may/may not belong here.
     tag.split('_')[0]

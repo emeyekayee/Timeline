@@ -11,7 +11,7 @@ function ux_time_offset(uxt) {
 }
 
 function ux_time_offset_pix(uxt) {
-  return UseBlock.secs_to_pix( ux_time_offset(uxt) )
+  return UseBlock.secs_to_pix_scale( ux_time_offset(uxt) )
 }
 
 function scroll_to_ux_time(uxt) {
@@ -23,6 +23,10 @@ function scroll_to_tlo() {
   scroll_to_ux_time( UseBlock.tlo )
 }
 
+function scroll_to_thi() {
+  scroll_to_ux_time( UseBlock.thi - 3 * 3600 )
+}
+
 function set_time_cursor() {
   var cursor = $('#current-time-cursor');
   var now_offset = ux_time_offset_pix( ux_time_now() );
@@ -31,19 +35,27 @@ function set_time_cursor() {
 }
 
 function ux_time_of_pix(x) {
-  return UseBlock.baseTime + UseBlock.pix_to_secs(x)
+  return UseBlock.pix_to_secs(x)
 }
 
+$( function () {
+    $('#scrolling-container').scroll( function(event) {
+      var vis_time = UseBlock.pix_to_secs(this.scrollLeft)
+      if (vis_time + UseBlock.timeWindow - UseBlock.thi > 0) {
+        ResourceListCtrl.$apply( ResourceListCtrl.more_data )
+      } else if (vis_time < UseBlock.tlo) {
+        ResourceListCtrl.$apply( ResourceListCtrl.less_data )
+      }
+    })
+})
 
 function ResourceListCtrl($scope, $http) {
   $.extend( $scope,
     {
-      init_resources: function () {
-        var rsrcs = UseBlock.rsrcs = UseBlock.meta.rsrcs
-        $scope.rsrcs = rsrcs            // Define the order of rows:
+      init_resources: function () {    // Define the order of rows:
+        $scope.rsrcs    = UseBlock.rsrcs = UseBlock.meta.rsrcs
         $scope.res_tags = [];
-
-        rsrcs.forEach( function(rsrc) {
+        $scope.rsrcs.forEach( function(rsrc) {
           $scope.res_tags.push( rsrc.tag )
         })
 
@@ -54,10 +66,9 @@ function ResourceListCtrl($scope, $http) {
       },
 
       get_data: function (t1, t2, inc) {
-        $http.get( $scope.build_url(t1, t2, inc) ).
+        return $http.get( $scope.build_url(t1, t2, inc) ).
 
           success( function(data) {
-            // BY HERE, THE BOGUS REQUEST IS ALREADY SEND TO SERVER
             UseBlock.meta = data.meta
             delete data.meta
 
@@ -69,8 +80,6 @@ function ResourceListCtrl($scope, $http) {
               $scope.init_resources($scope)
             }
             UseBlock.merge_metadata()
-            $scope.tlo = UseBlock.tlo  // Experimental
-            $scope.thi = UseBlock.thi  // Experimental
           }). // success
 
           error( function(data, status, headers, config) {
@@ -80,7 +89,6 @@ function ResourceListCtrl($scope, $http) {
                         )
             console.debug( data.meta )
           }) // error
-        return null;
       },
 
       build_url: function (t1, t2, inc) {
@@ -91,13 +99,35 @@ function ResourceListCtrl($scope, $http) {
       },
 
       more_data: function() {
-        $scope.get_data( UseBlock.thi, UseBlock.thi + 3 * 3600, 'hi' )
+        if (! $scope.busy ) {
+          $scope.busy = true;
+          $scope.get_data( UseBlock.thi, UseBlock.thi + 3 * 3600, 'hi' ).
+            success( function(data) {
+              Object.keys($scope.json_data).forEach( function(key) {
+                var controller = $scope.use_block_list_Ctls[key],
+                    blocks     = $scope.json_data[key]
+                controller.add_blocks( controller, blocks )
+              })
 
-        Object.keys($scope.json_data).forEach( function(key) {
-          var controller = $scope.use_block_list_Ctls[key],
-              blocks     = $scope.json_data[key]
-          controller.add_blocks( controller, blocks )
-        })
+            }); // errors handled above in get_data
+          $scope.busy = false;
+        }
+      },
+
+      less_data: function() {
+        if (! $scope.busy ) {
+          $scope.busy = true;
+          $scope.get_data( UseBlock.tlo - 3 * 3600, UseBlock.tlo, 'lo' ).
+            success( function(data) {
+              Object.keys($scope.json_data).forEach( function(key) {
+                var controller = $scope.use_block_list_Ctls[key],
+                    blocks     = $scope.json_data[key]
+                controller.add_blocks( controller, blocks )
+              })
+
+            }); // errors handled above in get_data
+          $scope.busy = false;
+        }
       },
 
       rsrcList: function() {
@@ -105,10 +135,10 @@ function ResourceListCtrl($scope, $http) {
         return [];
       }
     });
-
-  // $scope.rsrcs = [] // Didn't help.
+  window.ResourceListCtrl = $scope
   $scope.get_data();
 } // end ResourceListCtrl
+ResourceListCtrl.$inject = ['$scope', '$http'];
 
 
 var process_fns = {
@@ -125,11 +155,15 @@ function UseBlockListCtrl($scope) {
 
   $.extend( $scope, {
     add_blocks: function ( $scope, blocks ) {
+
+      if (UseBlock.inc == 'lo') {
+        blocks.reverse().forEach( function(block) {
+          $scope.use_blocks.unshift( $scope.process_fn(block.blk) )
+        })
+        return null
+      }
+
       blocks.forEach( function(block) {
-        if (UseBlock.inc == 'lo') {
-          console.log('Implement me !!! (inc=lo)')
-          return null
-        }
         $scope.use_blocks.push( $scope.process_fn(block.blk) )
       });
     }
@@ -152,13 +186,18 @@ function UseBlockListCtrl($scope) {
 
   $scope.add_blocks( $scope, blocks )
 }
+UseBlockListCtrl.$inject = ['$scope'];
 
 
 function UseBlockCtrl($scope) {
   var block = $scope.block // Just for debugger
 }
+UseBlockCtrl.$inject = ['$scope'];
+
 
 function LabelListCtrl($scope) {
   var tag = $scope.res_tag
   UseBlock.rsrcs[tag] // Huh?
 }
+LabelListCtrl.$inject = ['$scope'];
+
