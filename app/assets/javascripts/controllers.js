@@ -40,11 +40,13 @@ function ux_time_of_pix(x) {
 
 $( function () {
     $('#scrolling-container').scroll( function(event) {
-      var vis_time = UseBlock.pix_to_secs(this.scrollLeft)
-      if (vis_time + UseBlock.timeWindow - UseBlock.thi > 0) {
-        ResourceListCtrl.$apply( ResourceListCtrl.more_data )
-      } else if (vis_time < UseBlock.tlo) {
-        ResourceListCtrl.$apply( ResourceListCtrl.less_data )
+      var l_vis_time = UseBlock.pix_to_secs( this.scrollLeft ),
+          r_vis_time = l_vis_time + UseBlock.timeWindow
+
+      if ( r_vis_time > UseBlock.thi ) {
+        RsrcListCtrlScope.$apply( RsrcListCtrlScope.more_data )
+      } else if (l_vis_time < UseBlock.tlo) {
+        RsrcListCtrlScope.$apply( RsrcListCtrlScope.less_data )
       }
     })
 })
@@ -135,7 +137,7 @@ function ResourceListCtrl($scope, $http) {
         return [];
       }
     });
-  window.ResourceListCtrl = $scope
+  window.RsrcListCtrlScope = $scope
   $scope.get_data();
 } // end ResourceListCtrl
 ResourceListCtrl.$inject = ['$scope', '$http'];
