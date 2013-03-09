@@ -128,9 +128,13 @@ a:visited               { color: white;  text-decoration: none;}
 /* .TimeheaderDayNightrow */
 
 
-.TimeheaderDayNightrow  { height:    22px;}
+.TimeheaderDayNightrow  { height:           22px;
+                        }
 
-.TimeheaderDayNightrow .blockdiv  { height:   22px;}
+.TimeheaderDayNightrow .blockdiv  
+                        { height:           22px;
+                          padding-right:    4px;   /* Hack, for maybe rounding */
+                        }                          /* error on very wide divs  */
 
 .TimeheaderDayNightrow .rsrclabel img
                       {                        /* "inherit" no go for IE  */

@@ -40,6 +40,7 @@ function ux_time_of_pix(x) {
 
 $( function () {
     $('#scrolling-container').scroll( function(event) {
+      // What "times" are visible at left, right side of window?
       var l_vis_time = UseBlock.pix_to_secs( this.scrollLeft ),
           r_vis_time = l_vis_time + UseBlock.timeWindow
 

@@ -19,14 +19,15 @@ class @UseBlock
   # Ignoring @baseTime offset
   @secs_to_pix_scale: (seconds) ->
     pix = seconds * 750 / @timeWindow # Matching width of #scrolling-container
-    Math.round(pix * 100) / 100
+    # Math.round(pix * 100) / 100
 
   @pix_to_secs: (pix) ->
     @baseTime + Math.round(pix * @timeWindow  / 750)
 
   @bwidth: (block) ->
     [s, e] = [block.starttime, block.endtime]             # per margins V
-    "left: #{@secs_to_pix_scale(s - @baseTime)}px; width: #{@secs_to_pix_scale(e-s)-4}px;" 
+    "left: #{@secs_to_pix_scale(s - @baseTime)}px;" +
+    " width: #{@secs_to_pix_scale(e-s)-4}px;" 
   
   @row_kind: (tag) ->  # may/may not belong here.
     tag.split('_')[0]
