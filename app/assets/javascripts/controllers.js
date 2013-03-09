@@ -38,19 +38,34 @@ function ux_time_of_pix(x) {
   return UseBlock.pix_to_secs(x)
 }
 
-$( function () {
-    $('#scrolling-container').scroll( function(event) {
-      // What "times" are visible at left, right side of window?
-      var l_vis_time = UseBlock.pix_to_secs( this.scrollLeft ),
-          r_vis_time = l_vis_time + UseBlock.timeWindow
+function scroll_monitor() {
+  var     sc = $('#scrolling-container'),
+  l_vis_time = UseBlock.pix_to_secs( sc.scrollLeft() ),
+  r_vis_time = l_vis_time + UseBlock.timeWindow;
+  
+  if ( r_vis_time > UseBlock.thi ) {
+    RsrcListCtrlScope.$apply( RsrcListCtrlScope.more_data )
+  } else if (l_vis_time < UseBlock.tlo) {
+    RsrcListCtrlScope.$apply( RsrcListCtrlScope.less_data )
+  }
+  setTimeout( scroll_monitor, 100 )
+}
 
-      if ( r_vis_time > UseBlock.thi ) {
-        RsrcListCtrlScope.$apply( RsrcListCtrlScope.more_data )
-      } else if (l_vis_time < UseBlock.tlo) {
-        RsrcListCtrlScope.$apply( RsrcListCtrlScope.less_data )
-      }
-    })
-})
+$( function() { setTimeout( scroll_monitor, 100 ) } );
+
+// $( function () {
+//     $('#scrolling-container').scroll( function(event) {
+//       // What "times" are visible at left, right side of window?
+//       var l_vis_time = UseBlock.pix_to_secs( this.scrollLeft ),
+//           r_vis_time = l_vis_time + UseBlock.timeWindow
+
+//       if ( r_vis_time > UseBlock.thi ) {
+//         RsrcListCtrlScope.$apply( RsrcListCtrlScope.more_data )
+//       } else if (l_vis_time < UseBlock.tlo) {
+//         RsrcListCtrlScope.$apply( RsrcListCtrlScope.less_data )
+//       }
+//     })
+// })
 
 function ResourceListCtrl($scope, $http) {
   $.extend( $scope,
