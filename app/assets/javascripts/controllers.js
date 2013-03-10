@@ -75,36 +75,38 @@ function ResourceListCtrl($scope, $http) {
 ResourceListCtrl.$inject = ['$scope', '$http'];
 
 
+function ab (o) { return angular.bind( o, o.process ) }
+
 var process_fns = {
-  TimeheaderDayNight: angular.bind(TimeheaderDayNightUseBlock,
-                                   TimeheaderDayNightUseBlock.process),
-  TimeheaderHour:     angular.bind(TimeheaderHourUseBlock,
-                                   TimeheaderHourUseBlock.process),
-  Channel:            angular.bind(ChannelUseBlock,
-                                   ChannelUseBlock.process)
+  TimeheaderDayNight: ab(TimeheaderDayNightUseBlock),
+  TimeheaderHour:     ab(TimeheaderHourUseBlock),
+  Channel:            ab(ChannelUseBlock)
 }
 
 
 function UseBlockListCtrl($scope) {
 
   $.extend( $scope, {
-    add_blocks: function ( $scope, blocks ) {
 
+    add_blocks: function ( $scope, blocks ) {
+      var how = 'push'
       if (UseBlock.inc == 'lo') {
-        blocks.reverse().forEach( function(block) {
-          $scope.use_blocks.unshift( $scope.process_fn(block.blk) )
-        })
-        return null
-      }
+        how = 'unshift'
+        blocks = blocks.reverse()
+      }                        
 
       blocks.forEach( function(block) {
-        $scope.use_blocks.push( $scope.process_fn(block.blk) )
-      });
+        $scope.insert_block( $scope.process_fn(block.blk), how )
+      })
+    },
+
+    insert_block: function ( block, how ) {
+      $scope.use_blocks[how]( block )
     }
   });
 
 
-  if (! Array.isArray($scope.use_blocks)) $scope.use_blocks = [];
+  $scope.use_blocks = [];
 
   var resourceTag = $scope.res_tag,
       blocks      = $scope.json_data[ resourceTag ],
