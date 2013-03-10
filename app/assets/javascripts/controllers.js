@@ -6,7 +6,7 @@ function ResourceListCtrl($scope, $http) {
   $.extend( $scope,
     {
       init_resources: function () {    
-        $scope.rsrcs    = UseBlock.rsrcs = UseBlock.meta.rsrcs
+        $scope.rsrcs    = UseBlock.rsrcs = TimePix.meta.rsrcs
         $scope.res_tags = [];   // ^^ Defines the order of rows
         $scope.rsrcs.forEach( function(rsrc) {
           $scope.res_tags.push( rsrc.tag )
@@ -22,7 +22,7 @@ function ResourceListCtrl($scope, $http) {
         return $http.get( $scope.make_url(t1, t2, inc) ).
 
           success( function(data) {
-            UseBlock.merge_metadata(data)
+            TimePix.merge_metadata(data)
             delete data.meta
             $scope.json_data = data   // Park this here until we consume it.
 
@@ -62,11 +62,11 @@ function ResourceListCtrl($scope, $http) {
       },
       
       more_data: function() {
-          $scope.rq_data( UseBlock.thi, UseBlock.next_hi(), 'hi' )
+          $scope.rq_data( TimePix.thi, UseBlock.next_hi(), 'hi' )
       },
 
       less_data: function() {
-          $scope.rq_data( UseBlock.next_lo(), UseBlock.tlo, 'lo' )
+          $scope.rq_data( UseBlock.next_lo(), TimePix.tlo, 'lo' )
       }
     });
   window.RsrcListCtrlScope = $scope

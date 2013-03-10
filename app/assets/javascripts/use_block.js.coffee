@@ -1,37 +1,20 @@
 class @UseBlock
   constructor: -> nil
 
-  @baseTime: 0
-  @timeWindow: (3 * 3600)
-
-  # Time range [@tlo..@thi] is where the DOM has data.
-  @tlo: null
-  @thi: null
-
-  # Meta-data about most recent request
-  @meta: {}
-
-  @merge_metadata: (data) ->
-    @meta = data.meta
-    @baseTime ||= (@meta['minTime'] - @timeWindow * 8)
-    @tlo = @tlo && Math.min( @tlo, @meta.t1 ) || @meta.t1
-    @thi = @thi && Math.max( @thi, @meta.t2 ) || @meta.t2
-    @inc = @meta.inc
-
-  @next_hi: -> @thi + @timeWindow
-  @next_lo: -> @tlo - @timeWindow
+  @next_hi: -> TimePix.thi + TimePix.timeWindow
+  @next_lo: -> TimePix.tlo - TimePix.timeWindow
 
   # Ignoring @baseTime offset
   @secs_to_pix_scale: (seconds) ->
-    pix = seconds * 750 / @timeWindow # Matching width of #scrolling-container
+    pix = seconds * 750 / TimePix.timeWindow # Matching width of #scrolling-container
     # Math.round(pix * 100) / 100
 
   @pix_to_secs: (pix) ->
-    @baseTime + Math.round(pix * @timeWindow  / 750)
+    TimePix.baseTime + Math.round(pix * TimePix.timeWindow  / 750)
 
   @style_geo: (block) ->
     [s, e] = [block.starttime, block.endtime]             # per margins V
-    "left: #{@secs_to_pix_scale(s - @baseTime)}px; " +
+    "left: #{@secs_to_pix_scale(s - TimePix.baseTime)}px; " +
     "width: #{@secs_to_pix_scale(e-s)-4}px;" 
   
   @row_kind: (tag) ->  # may/may not belong here.
