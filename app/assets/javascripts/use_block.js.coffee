@@ -1,25 +1,6 @@
 class @UseBlock
   constructor: -> nil
 
-  @next_hi: -> TimePix.thi + TimePix.timeWindow
-  @next_lo: -> TimePix.tlo - TimePix.timeWindow
-
-  # Ignoring @baseTime offset
-  @secs_to_pix_scale: (seconds) ->
-    pix = seconds * 750 / TimePix.timeWindow # Matching width of #scrolling-container
-    # Math.round(pix * 100) / 100
-
-  @pix_to_secs: (pix) ->
-    TimePix.baseTime + Math.round(pix * TimePix.timeWindow  / 750)
-
-  @style_geo: (block) ->
-    [s, e] = [block.starttime, block.endtime]             # per margins V
-    "left: #{@secs_to_pix_scale(s - TimePix.baseTime)}px; " +
-    "width: #{@secs_to_pix_scale(e-s)-4}px;" 
-  
-  @row_kind: (tag) ->  # may/may not belong here.
-    tag.split('_')[0]
-
 
 class @ChannelUseBlock extends UseBlock
   constructor: -> nil
@@ -154,5 +135,3 @@ class @TimeheaderHourUseBlock extends UseBlock
 
   @css_classes: (block) ->
     block.css_classes = 'TimeheaderHourrow'
-
-

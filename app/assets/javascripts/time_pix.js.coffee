@@ -13,10 +13,29 @@ class @TimePix            # Ultimately, an angular $service
 
   @merge_metadata: (data) ->
     @meta = data.meta
-    TimePix.baseTime ||= (@meta['minTime'] - TimePix.timeWindow * 8)
-    TimePix.tlo = TimePix.tlo && Math.min( TimePix.tlo, @meta.t1 ) || @meta.t1
-    TimePix.thi = TimePix.thi && Math.max( TimePix.thi, @meta.t2 ) || @meta.t2
+    @baseTime ||= (@meta['minTime'] - @timeWindow * 8)
+    @tlo = @tlo && Math.min( @tlo, @meta.t1 ) || @meta.t1
+    @thi = @thi && Math.max( @thi, @meta.t2 ) || @meta.t2
     @inc = @meta.inc
+
+  @next_hi: -> @thi + @timeWindow
+  @next_lo: -> @tlo - @timeWindow
+
+  # Ignoring @baseTime offset
+  @secs_to_pix_scale: (seconds) ->
+    pix = seconds * 750 / @timeWindow # Matching width of #scrolling-container
+    # Math.round(pix * 100) / 100
+
+  @pix_to_secs: (pix) ->
+    @baseTime + Math.round(pix * @timeWindow  / 750)
+
+  @style_geo: (block) ->
+    [s, e] = [block.starttime, block.endtime]             # per margins V
+    "left: #{@secs_to_pix_scale(s - @baseTime)}px; " +
+    "width: #{@secs_to_pix_scale(e-s)-4}px;" 
+  
+  @row_kind: (tag) ->  # may/may not belong here.
+    tag.split('_')[0]
 
 
 
@@ -28,7 +47,7 @@ class @TimePix            # Ultimately, an angular $service
     uxt - @baseTime
 
   @ux_time_offset_pix: (uxt) ->
-    UseBlock.secs_to_pix_scale @ux_time_offset(uxt)
+    @secs_to_pix_scale @ux_time_offset(uxt)
 
   @scroll_to_ux_time: (uxt) ->
     sc = $('#scrolling-container')
@@ -38,7 +57,7 @@ class @TimePix            # Ultimately, an angular $service
     @scroll_to_ux_time( @thi - @timeWindow )
 
   @ux_time_of_pix: (x) ->
-    UseBlock.pix_to_secs(x) 
+    @pix_to_secs(x) 
 
   @scroll_to_tlo: =>   # bound
     @scroll_to_ux_time @tlo
@@ -53,7 +72,7 @@ class @TimePix            # Ultimately, an angular $service
 
   @scroll_monitor: =>
     sc = $('#scrolling-container')
-    l_vis_time = UseBlock.pix_to_secs sc.scrollLeft()
+    l_vis_time = @pix_to_secs sc.scrollLeft()
     r_vis_time = l_vis_time + @timeWindow
 
     if      r_vis_time > @thi

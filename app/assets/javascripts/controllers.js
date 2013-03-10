@@ -62,11 +62,11 @@ function ResourceListCtrl($scope, $http) {
       },
       
       more_data: function() {
-          $scope.rq_data( TimePix.thi, UseBlock.next_hi(), 'hi' )
+          $scope.rq_data( TimePix.thi, TimePix.next_hi(), 'hi' )
       },
 
       less_data: function() {
-          $scope.rq_data( UseBlock.next_lo(), TimePix.tlo, 'lo' )
+          $scope.rq_data( TimePix.next_lo(), TimePix.tlo, 'lo' )
       }
     });
   window.RsrcListCtrlScope = $scope
