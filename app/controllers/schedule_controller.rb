@@ -98,12 +98,12 @@ class ScheduleController < ApplicationController
   end
 
   def time_default
-    # z_offset = ActiveSupport::TimeZone['Pacific Time (US & Canada)'].utc_offset -
-    #            Time.now.utc_offset   # Typically, for deployment to UTC server
-
+    t0 = Time.now
+    zoffset = t0.utc_offset -
+              t0.in_time_zone('Pacific Time (US & Canada)').utc_offset
     # Fix Me: This needs to work whether server is Pacific zone or UTC, and
-    #         across DST boundaries.  The above doesn't switch on DST.
-    z_offset = 0
+    #         across DST boundaries.  (Check if I dropped a sign bit.)
+
     t_now = Time.now + z_offset
     t_now.change :min => (t_now.min/15) * 15
   end
