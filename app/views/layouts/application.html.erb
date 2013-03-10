@@ -19,7 +19,7 @@
         <div id="labels-container">
           <div id="resource-labels">
             <div ng-controller="LabelListCtrl"
-                 ng-repeat="rsrc in rsrcList()"
+                 ng-repeat="rsrc in rsrcs"
                  class="rsrcRow {{ rsrc.tag | rowKind }}row">
 
               <div class="rsrclabel">
@@ -45,7 +45,7 @@
                   <div ng-repeat="block in use_blocks" 
                        ng-controller="UseBlockCtrl"  valign="top"
                        class="{{ block.css_classes }} blockdiv"
-                       style="{{ block | bwidth }} ">
+                       style="{{ block | style_geo }} ">
                     <a href="">{{ block.label }}<br/>
                                {{ block.sub_label }}</a>
                     <!-- ~/aws-tv/app/views/schedule/_block_internal.html.erb -->

@@ -2,89 +2,24 @@
 
 /* Controllers */
 
-function ux_time_now() {
-  return new Date().valueOf() / 1000
-}
-
-function ux_time_offset(uxt) {
-  return uxt - UseBlock.baseTime
-}
-
-function ux_time_offset_pix(uxt) {
-  return UseBlock.secs_to_pix_scale( ux_time_offset(uxt) )
-}
-
-function scroll_to_ux_time(uxt) {
-  var sc = $('#scrolling-container')
-  sc.scrollLeft( ux_time_offset_pix(uxt) )
-}
-
-function scroll_to_tlo() {
-  scroll_to_ux_time( UseBlock.tlo )
-}
-
-function scroll_to_thi() {
-  scroll_to_ux_time( UseBlock.thi - 3 * 3600 )
-}
-
-function set_time_cursor() {
-  var cursor = $('#current-time-cursor');
-  var now_offset = ux_time_offset_pix( ux_time_now() );
-  cursor.css( 'left',  now_offset + 'px' )
-  setTimeout( set_time_cursor, 15 * 1000 )
-}
-
-function ux_time_of_pix(x) {
-  return UseBlock.pix_to_secs(x)
-}
-
-function scroll_monitor() {
-  var     sc = $('#scrolling-container'),
-  l_vis_time = UseBlock.pix_to_secs( sc.scrollLeft() ),
-  r_vis_time = l_vis_time + UseBlock.timeWindow;
-  
-  if ( r_vis_time > UseBlock.thi ) {
-    RsrcListCtrlScope.$apply( RsrcListCtrlScope.more_data )
-  } else if (l_vis_time < UseBlock.tlo) {
-    RsrcListCtrlScope.$apply( RsrcListCtrlScope.less_data )
-  }
-  setTimeout( scroll_monitor, 100 )
-}
-
-$( function() { setTimeout( scroll_monitor, 100 ) } );
-
-// $( function () {
-//     $('#scrolling-container').scroll( function(event) {
-//       // What "times" are visible at left, right side of window?
-//       var l_vis_time = UseBlock.pix_to_secs( this.scrollLeft ),
-//           r_vis_time = l_vis_time + UseBlock.timeWindow
-
-//       if ( r_vis_time > UseBlock.thi ) {
-//         RsrcListCtrlScope.$apply( RsrcListCtrlScope.more_data )
-//       } else if (l_vis_time < UseBlock.tlo) {
-//         RsrcListCtrlScope.$apply( RsrcListCtrlScope.less_data )
-//       }
-//     })
-// })
-
 function ResourceListCtrl($scope, $http) {
   $.extend( $scope,
     {
-      init_resources: function () {    // Define the order of rows:
+      init_resources: function () {    
         $scope.rsrcs    = UseBlock.rsrcs = UseBlock.meta.rsrcs
-        $scope.res_tags = [];
+        $scope.res_tags = [];   // ^^ Defines the order of rows
         $scope.rsrcs.forEach( function(rsrc) {
           $scope.res_tags.push( rsrc.tag )
         })
-
         $scope.use_block_list_Ctls = {} // To access lower-level scopes later on
 
-        setTimeout( scroll_to_tlo, 100 )
-        setTimeout( set_time_cursor, 1000 )
+        setTimeout( TimePix.scroll_to_tlo, 100 )
+        setTimeout( TimePix.set_time_cursor, 1000 )
+        setTimeout( TimePix.scroll_monitor, 100 )
       },
 
       get_data: function (t1, t2, inc) {
-        return $http.get( $scope.build_url(t1, t2, inc) ).
+        return $http.get( $scope.make_url(t1, t2, inc) ).
 
           success( function(data) {
             UseBlock.merge_metadata(data)
@@ -92,6 +27,7 @@ function ResourceListCtrl($scope, $http) {
             $scope.json_data = data   // Park this here until we consume it.
 
              if (! inc) { $scope.init_resources($scope) }
+            $scope.busy = false;
           }). // success
 
           error( function(data, status, headers, config) {
@@ -100,13 +36,14 @@ function ResourceListCtrl($scope, $http) {
                          '\nconfig: ' + config
                         )
             console.debug( data.meta )
+            $scope.busy = false;
           }) // error
       },
 
-      build_url: function (t1, t2, inc) {
+      make_url: function (t1, t2, inc) {
         var url = '/schedule.json'
-        if (inc) url = '/schedule.json'
-        if (t1 || t2 || inc) {url += '?t1=' + t1 + '&t2=' + t2 + '&inc=' + inc}
+        if (t1 || t2 || inc)
+          url += '?t1=' + t1 + '&t2=' + t2 + '&inc=' + inc
         return url
       },
 
@@ -120,23 +57,16 @@ function ResourceListCtrl($scope, $http) {
                     blocks     = $scope.json_data[key]
                 controller.add_blocks( controller, blocks )
               })
-              
             }); // errors handled above in get_data
-          $scope.busy = false;
         }
       },
       
       more_data: function() {
-          $scope.rq_data( UseBlock.thi, UseBlock.thi + 3 * 3600, 'hi' )
+          $scope.rq_data( UseBlock.thi, UseBlock.next_hi(), 'hi' )
       },
 
       less_data: function() {
-          $scope.rq_data( UseBlock.tlo - 3 * 3600, UseBlock.tlo, 'lo' )
-      },
-
-      rsrcList: function() {
-        if ( Array.isArray($scope.rsrcs) ) return $scope.rsrcs
-        return [];
+          $scope.rq_data( UseBlock.next_lo(), UseBlock.tlo, 'lo' )
       }
     });
   window.RsrcListCtrlScope = $scope

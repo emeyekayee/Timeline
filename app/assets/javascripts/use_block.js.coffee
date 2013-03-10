@@ -18,8 +18,9 @@ class @UseBlock
     @thi = @thi && Math.max( @thi, @meta.t2 ) || @meta.t2
     @inc = @meta.inc
 
-            
-  
+  @next_hi: -> @thi + @timeWindow
+  @next_lo: -> @tlo - @timeWindow
+
   # Ignoring @baseTime offset
   @secs_to_pix_scale: (seconds) ->
     pix = seconds * 750 / @timeWindow # Matching width of #scrolling-container
@@ -28,10 +29,10 @@ class @UseBlock
   @pix_to_secs: (pix) ->
     @baseTime + Math.round(pix * @timeWindow  / 750)
 
-  @bwidth: (block) ->
+  @style_geo: (block) ->
     [s, e] = [block.starttime, block.endtime]             # per margins V
-    "left: #{@secs_to_pix_scale(s - @baseTime)}px;" +
-    " width: #{@secs_to_pix_scale(e-s)-4}px;" 
+    "left: #{@secs_to_pix_scale(s - @baseTime)}px; " +
+    "width: #{@secs_to_pix_scale(e-s)-4}px;" 
   
   @row_kind: (tag) ->  # may/may not belong here.
     tag.split('_')[0]
@@ -55,7 +56,6 @@ class @ChannelUseBlock extends UseBlock
 
   @css_classes: (block) ->
     block.css_classes = @ct_name(block) + " " + @to_css_class(block.category)
-
 
 
   @ct_name: (block) ->
@@ -159,11 +159,11 @@ class @TimeheaderHourUseBlock extends UseBlock
     block
 
   @label: (block) ->
-    date  = new Date block.starttime * 1000
-    hours = date.getHours();
+    date   = new Date block.starttime * 1000
+    hours  = date.getHours();
     hours -= 12 if hours > 12
-    hours = 12 if hours == 0
-    mins  = date.getMinutes()
+    hours  = 12 if hours == 0
+    mins   = date.getMinutes()
     block.label = "#{hours}:#{mins}".replace( /:0$/, ':00' )
 
   @sub_label: (block) ->

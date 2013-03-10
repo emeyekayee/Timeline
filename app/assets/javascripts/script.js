@@ -2,8 +2,8 @@
 var tvAppModule = angular.module('tvApp', []);
  
 // Configure the module.  Create some filters.
-tvAppModule.filter('bwidth', function() {
-  return angular.bind(UseBlock, UseBlock.bwidth);
+tvAppModule.filter('style_geo', function() {
+  return angular.bind(UseBlock, UseBlock.style_geo);
 });
 
 tvAppModule.filter('rowKind', function() {
