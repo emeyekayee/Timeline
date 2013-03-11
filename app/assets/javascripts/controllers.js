@@ -3,46 +3,76 @@
 
 function justify_tweak() {
   var sc = $('#scrolling-container')
-  if (sc) vis_justify_timespans( sc.scrollLeft() )
+  if (sc) vis_justify_timespans( sc )
 }
 
-function vis_justify_timespans (scrollLeft) {
+function vis_justify_timespans (sc) {
   $('.TimeheaderDayNightrow .timespan').each( function() {
-    vis_justify_blockdivs (scrollLeft, $(this).children())
+    vis_justify_blockdivs (sc, $(this).children())
   })
 }
 
-function may_straddle (scrollLeft, blockdivs) {
-  for (var i = blockdivs.length - 1; i >= 0 ; i--) {
-    var bdiv = blockdivs[i];
-    if (parseInt(bdiv.style.left) < scrollLeft)
-      return bdiv
+function may_straddle (scrollLeft, scrollRight, blockdivs) {
+  var bdiv, bleft, divs = [], i
+  for (i = blockdivs.length - 1; i >= 0 ; i--) {
+    bdiv  = blockdivs[i];
+    bleft = parseInt(bdiv.style.left)  
+    if (bleft  < scrollRight) {
+      divs.push( bdiv )
+      i--
+      break
+    }}
+  if (bleft && bleft <= scrollLeft)
+    return divs
+  for (; i >= 0 ; i--) {
+    bdiv = blockdivs[i];
+    if (parseInt(bdiv.style.left) < scrollLeft) {
+      divs.push( bdiv )
+      break
+    }}
+    return divs
+  }
+
+
+function el_left(elt) { return parseInt(elt.style.left) }
+
+function vis_justify_blockdivs (sc, blockdivs) {
+  blockdivs.sort( function(a, b) { return el_left(a) - el_left(b) })
+    
+  var scrollLeft  = sc.scrollLeft(),
+      scrollRight = scrollLeft + TimePix.pixWindow,
+      bdivs       = may_straddle (scrollLeft, scrollRight, blockdivs);
+
+  if (bdivs.length == 1) straddles_both( scrollLeft, scrollRight, bdivs[0] )
+  else {
+    maybe_relocate (scrollLeft, bdivs.pop());
+    maybe_relocate_right (scrollRight , bdivs.pop());
   }
 }
 
-function vis_justify_blockdivs (scrollLeft, blockdivs) {
-  var bdiv = may_straddle (scrollLeft, blockdivs);
-  if (bdiv) 
-    maybe_relocate (scrollLeft, bdiv);
 
-  var scrollRight = scrollLeft + TimePix.pixWindow
-  bdiv = may_straddle (scrollRight, blockdivs);
-  if (bdiv) 
-    maybe_relocate_right (scrollRight , bdiv);
+function straddles_both (scrollLeft, scrollRight, bdiv) {
+  var tl = $('.text_locator', bdiv)
+  // tl.css(  'left',  scrollLeft - parseInt(bdiv.style.left) + 'px' )
+  // tl.css( 'width',  scrollRight - scrollLeft + 'px' )
+  $(tl).stop().animate({  left:  scrollLeft - parseInt(bdiv.style.left),
+                         width: scrollRight - scrollLeft },
+                        'fast' ) // { queue: true, duration: 200 }
 }
 
-function maybe_relocate_right (scrollRight, bdiv) {
-    var  bdiv_left = parseInt(bdiv.style.left);
-    var bdiv_width = parseInt(bdiv.style.width);
 
-    if ( bdiv_left + bdiv_width > scrollRight ) {
-      var tl = $('.text_locator', bdiv)
-      var room = scrollRight - parseInt( tl.parent().css('left') )
-   // var jleft  = Math.min( scrollLeft - bdiv_left, room - 190 )
-      var jwidth = Math.max( room, 190 )
-      tl.css(  'left',  0     + 'px' ) // Should calculate  ^^^ this Fix Me
-      tl.css( 'width',  jwidth + 'px' )
-    }
+function maybe_relocate_right (scrollRight, bdiv) {
+  var  bdiv_left = parseInt(bdiv.style.left);
+  var bdiv_width = parseInt(bdiv.style.width);
+
+  if ( bdiv_left + bdiv_width > scrollRight ) {
+    var tl = $('.text_locator', bdiv)
+    var room = scrollRight - parseInt( tl.parent().css('left') )
+ // var jleft  = Math.min( scrollLeft - bdiv_left, room - 190 )
+    var jwidth = Math.max( room, 190 )
+    tl.css(  'left',  0     + 'px' ) // Should calculate  ^^^ this Fix Me
+    tl.css( 'width',  jwidth + 'px' )
+  }
 }
 
 

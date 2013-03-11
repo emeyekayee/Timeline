@@ -100,8 +100,8 @@ class @TimeheaderDayNightUseBlock extends UseBlock
     date = new Date block.starttime * 1000
     ampm = 'am'; ampm = 'pm' if date.getHours() >= 12
     re = new RegExp(' ..:.*$')
-    ds = String(date).replace( re, '')
-    block.label = "  #{ampm}   #{ds}   #{ampm}  "
+    ds = String(date).replace( re, '').replace( /\d\d\d\d/, '')
+    block.label = "  #{ampm}   #{ds}  #{ampm}  "
 
   @sub_label: (block) ->
     block.sub_label = ''
@@ -128,7 +128,7 @@ class @TimeheaderHourUseBlock extends UseBlock
     hours -= 12 if hours > 12
     hours  = 12 if hours == 0
     mins   = date.getMinutes()
-    block.label = "#{hours}:#{mins}".replace( /:0$/, ':00' )
+    block.label = "    #{hours}:#{mins}".replace( /:0$/, ':00' )
 
   @sub_label: (block) ->
     block.sub_label = ''

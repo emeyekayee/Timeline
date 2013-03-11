@@ -135,8 +135,12 @@ a:visited               { color: white;  text-decoration: none;}
                         { height:           18px;
                           padding:          2px;
                           font-size:        14px;
-                          text-align:       center;
                         }                       
+
+.TimeheaderDayNightrow .text_locator {
+                          text-align:       center;
+                        }
+
 
 .TimeheaderDayNightrow .rsrclabel img
                       {                        /* "inherit" no go for IE  */
@@ -187,6 +191,9 @@ a:visited               { color: white;  text-decoration: none;}
                           font-size:        14px;
                         }
 
+.TimeheaderHourrow .text_locator {
+                          text-align:       center;
+                        }
 .TimeheaderHourrow .rsrclabel  > div.filter {
                           height:           22px;
                         }
