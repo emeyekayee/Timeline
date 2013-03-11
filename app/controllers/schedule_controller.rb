@@ -99,8 +99,8 @@ class ScheduleController < ApplicationController
 
   def time_default
     t0 = Time.now
-    zoffset = t0.utc_offset -
-              t0.in_time_zone('Pacific Time (US & Canada)').utc_offset
+    z_offset = t0.utc_offset -
+               t0.in_time_zone('Pacific Time (US & Canada)').utc_offset
     # Fix Me: This needs to work whether server is Pacific zone or UTC, and
     #         across DST boundaries.  (Check if I dropped a sign bit.)
 
