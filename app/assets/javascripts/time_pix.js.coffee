@@ -3,6 +3,7 @@ class @TimePix            # Ultimately, an angular $service
 
   @baseTime: 0
   @timeWindow: (3 * 3600)
+  @pixWindow: 750         # Matching width of #scrolling-container
 
   # Time range [@tlo..@thi] is where the DOM has data.
   @tlo: null
@@ -23,11 +24,11 @@ class @TimePix            # Ultimately, an angular $service
 
   # Ignoring @baseTime offset
   @secs_to_pix_scale: (seconds) ->
-    pix = seconds * 750 / @timeWindow # Matching width of #scrolling-container
+    pix = seconds * @pixWindow / @timeWindow
     # Math.round(pix * 100) / 100
 
   @pix_to_secs: (pix) ->
-    @baseTime + Math.round(pix * @timeWindow  / 750)
+    @baseTime + Math.round(pix * @timeWindow  / @pixWindow)
 
   @style_geo: (block) ->
     [s, e] = [block.starttime, block.endtime]             # per margins V
@@ -72,6 +73,11 @@ class @TimePix            # Ultimately, an angular $service
 
   @scroll_monitor: =>
     sc = $('#scrolling-container')
+
+    # Try to make scrolled-off content visible
+    vis_justify_timespans( sc.scrollLeft() )
+
+    # Fetch more data if needed
     l_vis_time = @pix_to_secs sc.scrollLeft()
     r_vis_time = l_vis_time + @timeWindow
 

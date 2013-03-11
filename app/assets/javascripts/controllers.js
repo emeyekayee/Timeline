@@ -1,5 +1,66 @@
 'use strict';
 
+
+function justify_tweak() {
+  var sc = $('#scrolling-container')
+  if (sc) vis_justify_timespans( sc.scrollLeft() )
+}
+
+function vis_justify_timespans (scrollLeft) {
+  $('.TimeheaderDayNightrow .timespan').each( function() {
+    vis_justify_blockdivs (scrollLeft, $(this).children())
+  })
+}
+
+function may_straddle (scrollLeft, blockdivs) {
+  for (var i = blockdivs.length - 1; i >= 0 ; i--) {
+    var bdiv = blockdivs[i];
+    if (parseInt(bdiv.style.left) < scrollLeft)
+      return bdiv
+  }
+}
+
+function vis_justify_blockdivs (scrollLeft, blockdivs) {
+  var bdiv = may_straddle (scrollLeft, blockdivs);
+  if (bdiv) 
+    maybe_relocate (scrollLeft, bdiv);
+
+  var scrollRight = scrollLeft + TimePix.pixWindow
+  bdiv = may_straddle (scrollRight, blockdivs);
+  if (bdiv) 
+    maybe_relocate_right (scrollRight , bdiv);
+}
+
+function maybe_relocate_right (scrollRight, bdiv) {
+    var  bdiv_left = parseInt(bdiv.style.left);
+    var bdiv_width = parseInt(bdiv.style.width);
+
+    if ( bdiv_left + bdiv_width > scrollRight ) {
+      var tl = $('.text_locator', bdiv)
+      var room = scrollRight - parseInt( tl.parent().css('left') )
+   // var jleft  = Math.min( scrollLeft - bdiv_left, room - 190 )
+      var jwidth = Math.max( room, 190 )
+      tl.css(  'left',  0     + 'px' ) // Should calculate  ^^^ this Fix Me
+      tl.css( 'width',  jwidth + 'px' )
+    }
+}
+
+
+function maybe_relocate (scrollLeft, bdiv) {
+    var  bdiv_left = parseInt(bdiv.style.left);
+    var bdiv_width = parseInt(bdiv.style.width);
+
+    if ( bdiv_left + bdiv_width > scrollLeft ) {
+      var tl = $('.text_locator', bdiv)
+      var room = parseInt( tl.parent().css('width') )
+      var jleft  = Math.min (scrollLeft - bdiv_left, room - 190 )
+      var jwidth = room - jleft
+      tl.css(  'left',  jleft + 'px' ) // Should calculate  ^^^ this Fix Me
+      tl.css( 'width',  room - jleft + 'px' )
+    }
+}
+
+
 /* Controllers */
 
 function ResourceListCtrl($scope, $http) {

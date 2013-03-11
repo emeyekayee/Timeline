@@ -134,6 +134,8 @@ a:visited               { color: white;  text-decoration: none;}
 .TimeheaderDayNightrow .blockdiv  
                         { height:           18px;
                           padding:          2px;
+                          font-size:        14px;
+                          text-align:       center;
                         }                       
 
 .TimeheaderDayNightrow .rsrclabel img
@@ -190,30 +192,30 @@ a:visited               { color: white;  text-decoration: none;}
                         }
 
 .TimeheaderHourrow div.rsrclabel
-                      {
-                        height:           22px;
-                        width:            56px;
-                      }
+                        {
+                         height:           22px;
+                         width:            56px;
+                        }
 
 .TimeheaderHourrow .rsrclabel img
-                      {                        /* "inherit" no go for IE  */
-                        height:           22px;
-                        width:            56px;
-                      }
+                       {                        /* "inherit" no go for IE  */
+                         height:           22px;
+                         width:            56px;
+                       }
 
 
-.timespan             { position:         absolute;
-                        left:             0px;  /* WAS 68px, space for labels */
-                      }
+.timespan              { position:         absolute;
+                         left:             0px;  /* WAS 68px, space for labels */
+                       }
 
 
-.blockdiv             { position:         absolute;
-                        border:           1px solid #002650;
-                        font-size:        11px;
-                        line-height:      1.2;
-                        white-space:      nowrap;
-                        overflow:         hidden;
-                      }
+.blockdiv              { position:         absolute;
+                         border:           1px solid #002650;
+                         font-size:        11px;
+                         line-height:      1.2;
+                         white-space:      nowrap;
+                         overflow:         hidden;
+                       }
 
 
 /****************************************************************************/
