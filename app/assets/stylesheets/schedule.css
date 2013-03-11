@@ -132,9 +132,9 @@ a:visited               { color: white;  text-decoration: none;}
                         }
 
 .TimeheaderDayNightrow .blockdiv  
-                        { height:           22px;
-                          padding-right:    4px;   /* Hack, for maybe rounding */
-                        }                          /* error on very wide divs  */
+                        { height:           18px;
+                          padding:          2px;
+                        }                       
 
 .TimeheaderDayNightrow .rsrclabel img
                       {                        /* "inherit" no go for IE  */
@@ -191,7 +191,6 @@ a:visited               { color: white;  text-decoration: none;}
 
 .TimeheaderHourrow div.rsrclabel
                       {
-                        /* color:            #D0E0F0; */
                         height:           22px;
                         width:            56px;
                       }
@@ -240,7 +239,7 @@ dl.detail_list        { background:    #111;
                         margin:        .125em;
                         width:         300px;
                         border-radius: 12px;
-                       }
+                      }
 
 
 dl.detail_list dt     { clear:        left;
@@ -248,24 +247,24 @@ dl.detail_list dt     { clear:        left;
                         width:        6em;
                         padding-top:  3px;
                         text-align:   right;
-                       }
+                      }
 
 
 dl.detail_list dd     { white-space:  normal;
                         padding-top:  3px;
                         margin-left:  6.75em;
                         max-width:    20em;
-                       }
+                      }
 
 
 dl.detail_list dd img { height:       12px; /* "inherit" no go for IE  */
                         width:        48px;
-                       }
+                      }
 
 .starsclip            { display:      inline-block;
                         white-space:  nowrap;
                         overflow:     hidden;
-                       }
+                      }
 
 /****************************************************************************/
 
