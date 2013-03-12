@@ -34,13 +34,26 @@ function may_straddle (scrollLeft, scrollRight, blockdivs) {
   }
 
 
-function el_left(elt) { return parseInt(elt.style.left) }
+function sort_em(divs) {
+  divs.sort(
+    function(a, b) {return parseInt(a.style.left) - parseInt(b.style.left)}
+  )
+}
 
+
+// Basically, just a filter the actual justify()
 function vis_justify_blockdivs (sc, blockdivs) {
-  blockdivs.sort( function(a, b) { return el_left(a) - el_left(b) })
-    
-  var scrollLeft  = sc.scrollLeft(),
-      scrollRight = scrollLeft + TimePix.pixWindow,
+  var scrollLeft  = sc.scrollLeft()
+  if ( vis_justify_blockdivs.old_srcoll == scrollLeft ) return
+  vis_justify_blockdivs.old_srcoll = scrollLeft
+
+  justify(scrollLeft, blockdivs)
+}
+
+
+function justify (scrollLeft, blockdivs) {
+  sort_em(blockdivs)
+  var scrollRight = scrollLeft + TimePix.pixWindow,
       bdivs       = may_straddle (scrollLeft, scrollRight, blockdivs);
 
   if (bdivs.length == 1)
@@ -53,12 +66,10 @@ function vis_justify_blockdivs (sc, blockdivs) {
 
 
 function common_data(bdiv) {
-  return {
-    bdiv:       bdiv,
-    tl:         $('.text_locator', bdiv),
-    bdiv_left:  parseInt(bdiv.style.left),  
-    bdiv_width: parseInt(bdiv.style.width)
-  }
+  return { bdiv:       bdiv,
+           tl:         $('.text_locator', bdiv),
+           bdiv_left:  parseInt(bdiv.style.left),  
+           bdiv_width: parseInt(bdiv.style.width) }
 }
 
 function straddles_both (scrollLeft, scrollRight, cd) {
@@ -67,8 +78,6 @@ function straddles_both (scrollLeft, scrollRight, cd) {
   relocate (cd.tl,  nleft, nwidth)
 }
 
-
-
 function straddles_right (scrollRight, cd) {
   if ( cd.bdiv_left + cd.bdiv_width > scrollRight ) {
     var room = scrollRight - parseInt( cd.tl.parent().css('left') )
@@ -76,7 +85,6 @@ function straddles_right (scrollRight, cd) {
     relocate (cd.tl,     0, jwidth)
   }
 }
-
 
 function straddles_left (scrollLeft, cd) {
     if ( cd.bdiv_left + cd.bdiv_width > scrollLeft ) {
@@ -88,11 +96,16 @@ function straddles_left (scrollLeft, cd) {
 }
 
 function relocate (tl, nleft, nwidth) {
-  // tl.css(  'left',  nleft + 'px' ) 
-  // tl.css( 'width',  nwidth + 'px' )
-  $(tl).stop().animate({ left: nleft, width: nwidth}, {duration: 800}) 
-  // 'fast' { queue: true, duration: 200 }
+  var $tl = $(tl)
+  $tl.animate({opacity: 0}, {queue: true, duration: 200})
+  $tl.animate({ left: nleft, width: nwidth}, {queue: true, duration: 0})
+  $tl.animate({opacity: 1}, {queue: true, duration: 800})
 }
+  // tl.css(  'left',   nleft + 'px' ) 
+  // tl.css( 'width',  nwidth + 'px' )
+  // $tl.fadeIn({duration: 800})
+  // $(tl).stop().animate({ left: nleft, width: nwidth}, {duration: 800}) 
+  // 'fast' { queue: true, duration: 200 }
 
 
 
