@@ -73,9 +73,9 @@ class @TimePix            # Ultimately, an angular $service
 
   @scroll_monitor: =>
     sc = $('#scrolling-container')
-    if @scroll_monitor.old_scroll != (scroll = sc.scrollLeft())
-      
-      vis_justify_timespans( sc ) # Try to make scrolled-off content visible
+    if @scroll_monitor.old_scroll != sc.scrollLeft()
+      @scroll_monitor.old_scroll = sc.scrollLeft()
+      @scroll_monitor.scroll_timestamp = new Date()
 
       # Fetch more data if needed
       l_vis_time = @pix_to_secs sc.scrollLeft()
@@ -85,8 +85,10 @@ class @TimePix            # Ultimately, an angular $service
         RsrcListCtrlScope.$apply RsrcListCtrlScope.more_data
       else if l_vis_time < @tlo
         RsrcListCtrlScope.$apply RsrcListCtrlScope.less_data
+    else
+      if new Date() - @scroll_monitor.scroll_timestamp > 1000
+        vis_justify_timespans( sc ) # Try to make scrolled-off content visible
+        @scroll_monitor.scroll_timestamp = new Date()
 
-      @scroll_monitor.old_scroll = scroll
-    
     setTimeout @scroll_monitor, 100
 

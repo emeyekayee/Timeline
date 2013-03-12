@@ -43,52 +43,57 @@ function vis_justify_blockdivs (sc, blockdivs) {
       scrollRight = scrollLeft + TimePix.pixWindow,
       bdivs       = may_straddle (scrollLeft, scrollRight, blockdivs);
 
-  if (bdivs.length == 1) straddles_both( scrollLeft, scrollRight, bdivs[0] )
+  if (bdivs.length == 1)
+    straddles_both( scrollLeft, scrollRight, common_data(bdivs[0]) )
   else {
-    maybe_relocate (scrollLeft, bdivs.pop());
-    maybe_relocate_right (scrollRight , bdivs.pop());
+    straddles_left  (scrollLeft,  common_data(bdivs.pop()));
+    straddles_right (scrollRight, common_data(bdivs.pop()));
   }
 }
 
 
-function straddles_both (scrollLeft, scrollRight, bdiv) {
-  var tl = $('.text_locator', bdiv)
-  // tl.css(  'left',  scrollLeft - parseInt(bdiv.style.left) + 'px' )
-  // tl.css( 'width',  scrollRight - scrollLeft + 'px' )
-  $(tl).stop().animate({  left:  scrollLeft - parseInt(bdiv.style.left),
-                         width: scrollRight - scrollLeft },
-                        'fast' ) // { queue: true, duration: 200 }
+function common_data(bdiv) {
+  return {
+    bdiv:       bdiv,
+    tl:         $('.text_locator', bdiv),
+    bdiv_left:  parseInt(bdiv.style.left),  
+    bdiv_width: parseInt(bdiv.style.width)
+  }
+}
+
+function straddles_both (scrollLeft, scrollRight, cd) {
+  var  nleft = scrollLeft  - cd.bdiv_left
+  var nwidth = scrollRight - scrollLeft
+  relocate (cd.tl,  nleft, nwidth)
 }
 
 
-function maybe_relocate_right (scrollRight, bdiv) {
-  var  bdiv_left = parseInt(bdiv.style.left);
-  var bdiv_width = parseInt(bdiv.style.width);
 
-  if ( bdiv_left + bdiv_width > scrollRight ) {
-    var tl = $('.text_locator', bdiv)
-    var room = scrollRight - parseInt( tl.parent().css('left') )
- // var jleft  = Math.min( scrollLeft - bdiv_left, room - 190 )
+function straddles_right (scrollRight, cd) {
+  if ( cd.bdiv_left + cd.bdiv_width > scrollRight ) {
+    var room = scrollRight - parseInt( cd.tl.parent().css('left') )
     var jwidth = Math.max( room, 190 )
-    tl.css(  'left',  0     + 'px' ) // Should calculate  ^^^ this Fix Me
-    tl.css( 'width',  jwidth + 'px' )
+    relocate (cd.tl,     0, jwidth)
   }
 }
 
 
-function maybe_relocate (scrollLeft, bdiv) {
-    var  bdiv_left = parseInt(bdiv.style.left);
-    var bdiv_width = parseInt(bdiv.style.width);
-
-    if ( bdiv_left + bdiv_width > scrollLeft ) {
-      var tl = $('.text_locator', bdiv)
-      var room = parseInt( tl.parent().css('width') )
-      var jleft  = Math.min (scrollLeft - bdiv_left, room - 190 )
-      var jwidth = room - jleft
-      tl.css(  'left',  jleft + 'px' ) // Should calculate  ^^^ this Fix Me
-      tl.css( 'width',  room - jleft + 'px' )
+function straddles_left (scrollLeft, cd) {
+    if ( cd.bdiv_left + cd.bdiv_width > scrollLeft ) {
+      var room = parseInt( cd.tl.parent().css('width') )
+      var jleft  = Math.min (scrollLeft - cd.bdiv_left, room - 190 )
+      var jwidth = room - jleft           // Should calculate  ^^^ this Fix Me
+      relocate (cd.tl, jleft, jwidth)
     }
 }
+
+function relocate (tl, nleft, nwidth) {
+  // tl.css(  'left',  nleft + 'px' ) 
+  // tl.css( 'width',  nwidth + 'px' )
+  $(tl).stop().animate({ left: nleft, width: nwidth}, {duration: 800}) 
+  // 'fast' { queue: true, duration: 200 }
+}
+
 
 
 /* Controllers */
