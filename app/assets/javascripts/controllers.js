@@ -66,8 +66,7 @@ function justify (scrollLeft, blockdivs) {
 
 
 function common_data(bdiv) {
-  return { bdiv:       bdiv,
-           tl:         $('.text_locator', bdiv),
+  return { tl:         $('.text_locator', bdiv),
            bdiv_left:  parseInt(bdiv.style.left),  
            bdiv_width: parseInt(bdiv.style.width) }
 }
