@@ -7,16 +7,12 @@ class @ChannelUseBlock extends UseBlock
 
   @process: (prog) ->
     @css_classes prog
-    @sub_label   prog
     @label       prog
     prog
 
   @label: (prog) ->
-    prog.label = prog.title + (prog.subtitle && ':' || '')
-
-  @sub_label: (prog) ->
-    prog.sub_label = ''
-    prog.sub_label = ' ' + prog.subtitle if prog.subtitle
+    prog.label  = prog.title
+    prog.label += ":<br> #{prog.subtitle}" if prog.subtitle
 
   @css_classes: (block) ->
     block.css_classes = @ct_name(block) + " " + @to_css_class(block.category)
@@ -92,7 +88,6 @@ class @TimeheaderDayNightUseBlock extends UseBlock
 
   @process: (block) ->
     @label       block
-    @sub_label   block
     @css_classes block
     block
 
@@ -100,11 +95,10 @@ class @TimeheaderDayNightUseBlock extends UseBlock
     date = new Date block.starttime * 1000
     ampm = 'am'; ampm = 'pm' if date.getHours() >= 12
     re = new RegExp(' ..:.*$')
-    ds = String(date).replace( re, '').replace( /\d\d\d\d/, '')
-    block.label = "  #{ampm}   #{ds}  #{ampm}  "
-
-  @sub_label: (block) ->
-    block.sub_label = ''
+    ds = String(date).replace(re, '').replace(/\d\d\d\d/, '')
+           .replace( new RegExp(' ', 'g'), '  ')
+    block.label = "<span class='ampmLeft'>   #{ampm}</span>#{ds}" +
+                  "<span class='ampmRight'>#{ampm}  </span>"
 
   @css_classes: (block) ->
     date = new Date block.starttime * 1000
@@ -118,20 +112,15 @@ class @TimeheaderHourUseBlock extends UseBlock
 
   @process: (block) ->
     @label       block
-    @sub_label   block
     @css_classes block
     block
 
   @label: (block) ->
     date   = new Date block.starttime * 1000
-    hours  = date.getHours();
-    hours -= 12 if hours > 12
-    hours  = 12 if hours == 0
+    hours  = date.getHours() + 12;
+    hours -= 12 while hours > 12
     mins   = date.getMinutes()
     block.label = "    #{hours}:#{mins}".replace( /:0$/, ':00' )
-
-  @sub_label: (block) ->
-    block.sub_label = ''
 
   @css_classes: (block) ->
     block.css_classes = 'TimeheaderHourrow'

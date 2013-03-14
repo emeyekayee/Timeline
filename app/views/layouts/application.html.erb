@@ -43,14 +43,12 @@
                 
                 <div class="timespan">
                   <div ng-repeat="block in use_blocks" 
-                       ng-controller="UseBlockCtrl"  valign="top"
+                       ng-controller="UseBlockCtrl"
                        class="{{ block.css_classes }} blockdiv"
                        style="{{ block | style_geo }} ">
 
-                    <div class="text_locator"
-                         style="position: absolute; left: 0px">
-                      <a href="">{{ block.label }}<br/>
-                                 {{ block.sub_label }}</a>
+                    <div class="text_locator">
+                      <a href="" ng-bind-html-unsafe="block.label"></a>
                     </div>
 
                     <!-- ~/aws-tv/app/views/schedule/_block_internal.html.erb -->
