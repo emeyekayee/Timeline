@@ -32,6 +32,8 @@ a:visited               { color: white;  text-decoration: none;}
 
 .text_locator           { position:         absolute;
                           left:             2px;
+                          right:            4px;
+                          overflow:         hidden;
                         }
 
 #scrolling-container    { overflow-x:       scroll;

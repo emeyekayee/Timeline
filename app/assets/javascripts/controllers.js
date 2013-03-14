@@ -48,7 +48,7 @@ function sort_em (divs) {
 // Experiment justifying Channelrows
 
 function justify_left (scrollLeft, blockdivs) {
-  sort_em( blockdivs )
+  // sort_em( blockdivs )
 
   var scrollRight = scrollLeft + TimePix.pixWindow,
       bdivs       = may_straddle (scrollLeft, scrollRight, blockdivs);  
@@ -63,8 +63,8 @@ function justify_left (scrollLeft, blockdivs) {
 function justify_left_1 ( scrollLeft, cd ) {
   if ( cd.bdiv_left + cd.bdiv_width > scrollLeft ) {
     var jleft  = scrollLeft - cd.bdiv_left
-    // cd.tl.css('left', jleft + 'px')
 
+    // cd.tl.css('left', jleft + 'px')
     cd.tl.animate({left: jleft}, rand_speed())
   }
 }
@@ -72,7 +72,6 @@ function justify_left_1 ( scrollLeft, cd ) {
 function undo_any_justify_left (bdivs) {
   bdivs.forEach( function( bdiv ) {
     // $('.text_locator', bdiv).css( 'left', '')
-
     $('.text_locator', bdiv).animate({ left: 2 }, rand_speed())
   })
 }
@@ -82,7 +81,7 @@ function rand_speed() { return { duration: 400 + Math.random() * 400 } }
 //////////////////////////////////////////////////////////////////////////////
 
 function justify (scrollLeft, blockdivs) {
-  sort_em(blockdivs)
+  // sort_em(blockdivs)
   var scrollRight = scrollLeft + TimePix.pixWindow,
       bdivs       = may_straddle (scrollLeft, scrollRight, blockdivs);
 
@@ -226,9 +225,9 @@ function UseBlockListCtrl($scope) {
 
     add_blocks: function ( $scope, blocks ) {
       var how = 'push'
-      if (UseBlock.inc == 'lo') {
+      if (TimePix.inc == 'lo') {
         how = 'unshift'
-        blocks = blocks.reverse()
+        blocks.reverse()
       }                        
 
       blocks.forEach( function(block) {
