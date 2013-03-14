@@ -37,15 +37,15 @@ function may_straddle (scrollLeft, scrollRight, blockdivs) {
   return divs
 }
 
-function sort_em (divs) {
-  divs.sort( function(a, b) {
-    return parseInt(a.style.left) - parseInt(b.style.left)
-  })
-}
+// function sort_em (divs) {
+//   divs.sort( function(a, b) {
+//     return parseInt(a.style.left) - parseInt(b.style.left)
+//   })
+// }
 
 
 //////////////////////////////////////////////////////////////////////////////
-// Experiment justifying Channelrows
+// Re-align left-aligned block content (typ. Channelrows)
 
 function justify_left (scrollLeft, blockdivs) {
   // sort_em( blockdivs )
@@ -72,13 +72,16 @@ function justify_left_1 ( scrollLeft, cd ) {
 function undo_any_justify_left (bdivs) {
   bdivs.forEach( function( bdiv ) {
     // $('.text_locator', bdiv).css( 'left', '')
-    $('.text_locator', bdiv).animate({ left: 2 }, rand_speed())
+    var tl = $('.text_locator', bdiv)
+    if ( parseInt(tl.css('left')) == 2 ) {return}
+    tl.animate({ left: "2" }, rand_speed())
   })
 }
 
 function rand_speed() { return { duration: 400 + Math.random() * 400 } }
 
 //////////////////////////////////////////////////////////////////////////////
+// Re-align center-aligned block content ()
 
 function justify (scrollLeft, blockdivs) {
   // sort_em(blockdivs)
@@ -133,6 +136,7 @@ function relocate (tl, nleft, nwidth) {
   // $(tl).stop().animate({ left: nleft, width: nwidth}, {duration: 800}) 
   // 'fast' { queue: true, duration: 200 }
 
+//////////////////////////////////////////////////////////////////////////////
 
 
 /* Controllers */
