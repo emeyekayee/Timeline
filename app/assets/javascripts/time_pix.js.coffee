@@ -87,7 +87,7 @@ class @TimePix            # Ultimately, an angular $service
         RsrcListCtrlScope.$apply RsrcListCtrlScope.less_data
     else
       if new Date() - @scroll_monitor.scroll_timestamp > 1000
-        vis_justify_timespans( sc ) # Try to make scrolled-off content visible
+        filter_justify_tweaks( sc ) # Try to make scrolled-off content visible
         @scroll_monitor.scroll_timestamp = new Date()
 
     setTimeout @scroll_monitor, 100

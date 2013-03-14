@@ -1,55 +1,85 @@
 'use strict';
 
 
-function justify_tweak() {
-  var sc = $('#scrolling-container')
-  if (sc) vis_justify_timespans( sc )
+// Don't repeat the same calculation.
+function filter_justify_tweaks(sc) {
+  var scrollLeft  = sc.scrollLeft()
+  if ( filter_justify_tweaks.old_srcoll == scrollLeft ) return
+  filter_justify_tweaks.old_srcoll = scrollLeft
+  do_justify_tweaks( sc, scrollLeft )
 }
 
-function vis_justify_timespans (sc) {
-  $('.TimeheaderDayNightrow .timespan').each( function() {
-    vis_justify_blockdivs (sc, $(this).children())
+
+function do_justify_tweaks (sc, scrollLeft) {
+  $('.TimeheaderDayNightrow .timespan').each( function() { // Centered
+    justify( scrollLeft, $(this).children() )
+  });
+
+  $('.Channelrow .timespan').each( function() {            // Left-aligned
+    justify_left( scrollLeft, $(this).children() )
+  });
+}
+
+
+function may_straddle (scrollLeft, scrollRight, blockdivs) {
+  var divs = [], i = 0, len = blockdivs.length, bdiv;
+
+  while ( i < len  &&  (bdiv = blockdivs[i])  &&
+          parseInt(bdiv.style.left) < scrollLeft ) {i++}
+  if (i > 0) { i-- }
+
+  while ( i < len  &&
+          (bdiv = blockdivs[i])  &&
+          parseInt(bdiv.style.left) < scrollRight ) {
+    divs.push( bdiv )
+    i++
+  }
+  return divs
+}
+
+function sort_em (divs) {
+  divs.sort( function(a, b) {
+    return parseInt(a.style.left) - parseInt(b.style.left)
   })
 }
 
-function may_straddle (scrollLeft, scrollRight, blockdivs) {
-  var bdiv, bleft, divs = [], i
-  for (i = blockdivs.length - 1; i >= 0 ; i--) {
-    bdiv  = blockdivs[i];
-    bleft = parseInt(bdiv.style.left)  
-    if (bleft  < scrollRight) {
-      divs.push( bdiv )
-      i--
-      break
-    }}
-  if (bleft && bleft <= scrollLeft)
-    return divs
-  for (; i >= 0 ; i--) {
-    bdiv = blockdivs[i];
-    if (parseInt(bdiv.style.left) < scrollLeft) {
-      divs.push( bdiv )
-      break
-    }}
-    return divs
+
+//////////////////////////////////////////////////////////////////////////////
+// Experiment justifying Channelrows
+
+function justify_left (scrollLeft, blockdivs) {
+  sort_em( blockdivs )
+
+  var scrollRight = scrollLeft + TimePix.pixWindow,
+      bdivs       = may_straddle (scrollLeft, scrollRight, blockdivs);  
+
+  if (! bdivs) {return}
+
+  justify_left_1 ( scrollLeft,  common_data( bdivs.shift() ) );  
+
+  undo_any_justify_left (bdivs);
+}
+
+function justify_left_1 ( scrollLeft, cd ) {
+  if ( cd.bdiv_left + cd.bdiv_width > scrollLeft ) {
+    var jleft  = scrollLeft - cd.bdiv_left
+    // cd.tl.css('left', jleft + 'px')
+
+    cd.tl.animate({left: jleft}, rand_speed())
   }
-
-
-function sort_em(divs) {
-  divs.sort(
-    function(a, b) {return parseInt(a.style.left) - parseInt(b.style.left)}
-  )
 }
 
+function undo_any_justify_left (bdivs) {
+  bdivs.forEach( function( bdiv ) {
+    // $('.text_locator', bdiv).css( 'left', '')
 
-// Basically, just a filter the actual justify()
-function vis_justify_blockdivs (sc, blockdivs) {
-  var scrollLeft  = sc.scrollLeft()
-  if ( vis_justify_blockdivs.old_srcoll == scrollLeft ) return
-  vis_justify_blockdivs.old_srcoll = scrollLeft
-
-  justify(scrollLeft, blockdivs)
+    $('.text_locator', bdiv).animate({ left: 2 }, rand_speed())
+  })
 }
 
+function rand_speed() { return { duration: 400 + Math.random() * 400 } }
+
+//////////////////////////////////////////////////////////////////////////////
 
 function justify (scrollLeft, blockdivs) {
   sort_em(blockdivs)
@@ -59,11 +89,10 @@ function justify (scrollLeft, blockdivs) {
   if (bdivs.length == 1)
     straddles_both( scrollLeft, scrollRight, common_data(bdivs[0]) )
   else {
-    straddles_left  (scrollLeft,  common_data(bdivs.pop()));
+    straddles_left  (scrollLeft,  common_data(bdivs.shift()));
     straddles_right (scrollRight, common_data(bdivs.pop()));
   }
 }
-
 
 function common_data(bdiv) {
   return { tl:         $('.text_locator', bdiv),
@@ -95,10 +124,9 @@ function straddles_left (scrollLeft, cd) {
 }
 
 function relocate (tl, nleft, nwidth) {
-  var $tl = $(tl)
-  $tl.animate({opacity: 0}, {queue: true, duration: 200})
-  $tl.animate({ left: nleft, width: nwidth}, {queue: true, duration: 0})
-  $tl.animate({opacity: 1}, {queue: true, duration: 800})
+  tl.animate({opacity: 0}, {queue: true, duration: 200})
+  tl.animate({ left: nleft, width: nwidth}, {queue: true, duration: 0})
+  tl.animate({opacity: 1}, {queue: true, duration: 800})
 }
   // tl.css(  'left',   nleft + 'px' ) 
   // tl.css( 'width',  nwidth + 'px' )

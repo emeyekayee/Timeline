@@ -98,7 +98,7 @@ class @TimeheaderDayNightUseBlock extends UseBlock
     ds = String(date).replace(re, '').replace(/\d\d\d\d/, '')
            .replace( new RegExp(' ', 'g'), '  ')
     block.label = "<span class='ampmLeft'>   #{ampm}</span>#{ds}" +
-                  "<span class='ampmRight'>#{ampm}  </span>"
+                  "<span class='ampmRight'>#{ampm}   </span>"
 
   @css_classes: (block) ->
     date = new Date block.starttime * 1000
