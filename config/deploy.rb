@@ -44,3 +44,37 @@ end
 # namespace :deploy do
 #   task :create_symlink do; end
 # end
+
+
+# Customization --mjc
+
+set :from_db_host, 'cannon@mjc3'
+set :dump_file,    '/tmp/mythconverg.sql.gz'
+set :dcmd,         "mysqldump -u mythtv -pXdl5bjo6 mythconverg | " +
+                   "gzip - >#{dump_file}"
+set :prod_db_host, 'ubuntu@prod1.emeyekayee.com'
+
+desc <<-DESC
+  Dump the local database for export to production database.
+DESC
+task :dump_source_db, hosts: from_db_host do
+  `ssh #{from_db_host} "#{dcmd}"`
+  puts "The mysqldump completed with exit code #{$?}"
+
+  `scp -p #{from_db_host}:#{dump_file} #{dump_file}`
+  puts "Local copy completed with exit code #{$?}"
+end
+
+
+desc <<-DESC
+  Send the local database dump to production database.
+DESC
+task :update_mythconverg_db do # , :roles => :mysql_master
+
+  `scp -i ~/.ec2/gpg-keypair #{dump_file} #{prod_db_host}:#{dump_file}`
+
+  `ssh -i ~/.ec2/gpg-keypair #{prod_db_host} "zcat #{dump_file} | mysql -u root mythconverg"`
+
+end
+
+before "update_mythconverg_db", "dump_source_db"
