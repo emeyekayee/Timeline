@@ -117,12 +117,12 @@ function straddles_right (scrollRight, cd) {
 }
 
 function straddles_left (scrollLeft, cd) {
-    if ( cd.bdiv_left + cd.bdiv_width > scrollLeft ) {
-      var room = parseInt( cd.tl.parent().css('width') )
-      var jleft  = Math.min (scrollLeft - cd.bdiv_left, room - 190 )
-      var jwidth = room - jleft           // Should calculate  ^^^ this Fix Me
-      relocate (cd.tl, jleft, jwidth)
-    }
+  if ( cd.bdiv_left + cd.bdiv_width > scrollLeft ) {
+    var room = parseInt( cd.tl.parent().css('width') )
+    var jleft  = Math.min (scrollLeft - cd.bdiv_left, room - 190 )
+    var jwidth = room - jleft           // Should calculate  ^^^ this Fix Me
+    relocate (cd.tl, jleft, jwidth)
+  }
 }
 
 function relocate (tl, nleft, nwidth) {

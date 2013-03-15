@@ -93,18 +93,22 @@ class @TimeheaderDayNightUseBlock extends UseBlock
 
   @label: (block) ->
     date = new Date block.starttime * 1000
-    ampm = 'am'; ampm = 'pm' if date.getHours() >= 12
-    re = new RegExp(' ..:.*$')
-    ds = String(date).replace(re, '').replace(/\d\d\d\d/, '')
-           .replace( new RegExp(' ', 'g'), '  ')
+    ampm = date.getHours() < 12 && 'am' || 'pm' 
+    ds   = @munge( String date )
     block.label = "<span class='ampmLeft'>   #{ampm}</span>#{ds}" +
                   "<span class='ampmRight'>#{ampm}   </span>"
+  
+  @munge: (dstr) ->
+    dstr.replace( new RegExp(' ..:.*$'),       '' )
+        .replace( new RegExp(' \\d\\d\\d\\d'), '' )
+        .replace( new RegExp(' ', 'g'),      '  ' )
 
   @css_classes: (block) ->
     date = new Date block.starttime * 1000
     classes = 'TimeheaderDayNightrow '
     classes += date.getHours() >= 12 && 'pmTimeblock' || 'amTimeblock'
     block.css_classes = classes
+
 
 
 class @TimeheaderHourUseBlock extends UseBlock
@@ -124,3 +128,6 @@ class @TimeheaderHourUseBlock extends UseBlock
 
   @css_classes: (block) ->
     block.css_classes = 'TimeheaderHourrow'
+
+
+
