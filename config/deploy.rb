@@ -1,5 +1,4 @@
 require "bundler/capistrano"
-# require 'fast_git_deploy/enable'
 
 set :application, "tvg"
 set :repository,  "https://github.com/emeyekayee/Timeline.git"
@@ -7,11 +6,10 @@ set :repository,  "https://github.com/emeyekayee/Timeline.git"
 set :user, "ubuntu"
 set :use_sudo, false
 set :deploy_type, :deploy
-set :branch, "AWS-chef-deploy"
+set :branch, "Ang-Rails"
 
 default_run_options[:pty] = true
 ssh_options[:forward_agent] = true
-# ssh_options[:keys] = [File.join(ENV["HOME"], ".vagrant.d", "insecure_private_key")]
 ssh_options[:keys] = [File.expand_path('~/.ec2/gpg-keypair')]
 
 role :app, "tvg.test"
@@ -52,7 +50,7 @@ set :from_db_host, 'cannon@mjc3'
 set :dump_file,    '/tmp/mythconverg.sql.gz'
 set :dcmd,         "mysqldump -u mythtv -pXdl5bjo6 mythconverg | " +
                    "gzip - >#{dump_file}"
-set :prod_db_host, 'ubuntu@prod1.emeyekayee.com'
+set :prod_db_host, 'ubuntu@prod4.emeyekayee.com'
 
 desc <<-DESC
   Dump the local database for export to production database.
