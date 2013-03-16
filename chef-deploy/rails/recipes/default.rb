@@ -35,7 +35,7 @@ nginx_config_path = "/etc/nginx/sites-available/#{common[:name]}.conf"
 template nginx_config_path do
   mode 0644
   source "nginx.conf.erb"
-  variables common.merge(:server_names => "tvg.test")
+  variables common.merge(:server_names => "prod4.emeyekayee.com")
   notifies :reload, "service[nginx]"
 end
 

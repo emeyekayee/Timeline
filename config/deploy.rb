@@ -12,9 +12,9 @@ default_run_options[:pty] = true
 ssh_options[:forward_agent] = true
 ssh_options[:keys] = [File.expand_path('~/.ec2/gpg-keypair')]
 
-role :app, "tvg.test"
-role :web, "tvg.test"
-role :db,  "tvg.test", :primary => true
+role :app, "prod4.emeyekayee.com"
+role :web, "prod4.emeyekayee.com"
+role :db,  "prod4.emeyekayee.com", :primary => true
 
 set :normalize_asset_timestamps, false # task :finalize_update failing from
                                        # images, etc not being under .../public
