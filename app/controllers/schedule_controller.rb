@@ -104,7 +104,7 @@ class ScheduleController < ApplicationController
     # Fix Me: This needs to work whether server is Pacific zone or UTC, and
     #         across DST boundaries.  (Check if I dropped a sign bit.)
 
-    t_now = Time.now + z_offset
+    t_now = Time.now - z_offset
     t_now.change :min => (t_now.min/15) * 15
   end
 
