@@ -71,7 +71,7 @@ class ScheduleController < ApplicationController
   end
 
   def time_default
-    t_now = Time.now - z_offset
+    t_now = Time.now
     t_now.change :min => (t_now.min/15) * 15
   end
 
