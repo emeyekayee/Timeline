@@ -50,7 +50,7 @@ set :from_db_host, 'cannon@mjc3'
 set :dump_file,    '/tmp/mythconverg.sql.gz'
 set :dcmd,         "mysqldump -u mythtv -pXdl5bjo6 mythconverg | " +
                    "gzip - >#{dump_file}"
-set :prod_db_host, 'ubuntu@prod4.emeyekayee.com'
+set :prod_db_hosts, ['ubuntu@prod2.emeyekayee.com', 'ubuntu@prod4.emeyekayee.com']
 
 desc <<-DESC
   Dump the local database for export to production database.
@@ -69,9 +69,10 @@ desc <<-DESC
 DESC
 task :update_mythconverg_db do # , :roles => :mysql_master
 
-  `scp -i ~/.ec2/gpg-keypair #{dump_file} #{prod_db_host}:#{dump_file}`
-
-  `ssh -i ~/.ec2/gpg-keypair #{prod_db_host} "zcat #{dump_file} | mysql -u root mythconverg"`
+  prod_db_hosts.each do |prod_db_host|
+    `scp -i ~/.ec2/gpg-keypair #{dump_file} #{prod_db_host}:#{dump_file}`
+    `ssh -i ~/.ec2/gpg-keypair #{prod_db_host} "zcat #{dump_file} | mysql -u root mythconverg"`
+  end
 
 end
 

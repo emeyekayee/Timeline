@@ -12,7 +12,7 @@ visibleTime: 3.hours
 Resources:
    - TimeheaderDayNight   dayNight0
    - TimeheaderHour       hour0
-   - Channel              60  189 190 204
+   - Channel              703 709 60 189 190
    - TimeheaderHour       hour1
    - Channel              37 737 42 738 756 757 49
    # - Channel              798
