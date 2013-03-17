@@ -50,29 +50,8 @@ class ScheduleController < ApplicationController
 
   def groupupdate
     SchedResource.ensure_config session
-
     param_defaults params
-
     get_data_for_time_span
-    respond_to do |format|
-      format.html
-      format.json do
-
-        baseTime = 2 ** 31
-        @blockss.each do |rsrc, blocks|
-          blocks.each do |block|
-            block.starttime =  block.starttime.to_i
-            block.endtime   =  block.endtime.to_i
-            baseTime = block.starttime if block.starttime < baseTime
-          end
-        end
-        @blockss['meta'] = {
-          rsrcs: @rsrcs, baseTime: baseTime,
-          t1: @t1.to_i, t2: @t2.to_i, inc: @inc,
-        }
-        render json: @blockss
-      end
-    end
   end
 
   def test
@@ -85,12 +64,6 @@ class ScheduleController < ApplicationController
 
   private
 
-  # HH:MMam(pm)
-  def hm_ampm(t)
-    t = Time.at(t) if t.kind_of? Numeric
-    Time.at(t).strftime("%I:%M%p").downcase.sub(/^0/,'')
-  end
-
   def param_defaults(p = {})
     @t1 = p[:t1] || time_default
     @t2 = p[:t2] || @t1 + SchedResource.visible_time
@@ -98,12 +71,6 @@ class ScheduleController < ApplicationController
   end
 
   def time_default
-    t0 = Time.now
-    z_offset = t0.utc_offset -
-               t0.in_time_zone('Pacific Time (US & Canada)').utc_offset
-    # Fix Me: This needs to work whether server is Pacific zone or UTC, and
-    #         across DST boundaries.  (Check if I dropped a sign bit.)
-
     t_now = Time.now - z_offset
     t_now.change :min => (t_now.min/15) * 15
   end
