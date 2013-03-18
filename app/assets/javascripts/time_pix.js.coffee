@@ -14,7 +14,7 @@ class @TimePix            # Ultimately, an angular $service
 
   @merge_metadata: (data) ->
     @meta = data.meta
-    @baseTime ||= (@meta['minTime'] - @timeWindow * 8)
+    @baseTime ||= @meta['min_time']
     @tlo = @tlo && Math.min( @tlo, @meta.t1 ) || @meta.t1
     @thi = @thi && Math.max( @thi, @meta.t2 ) || @meta.t2
     @inc = @meta.inc

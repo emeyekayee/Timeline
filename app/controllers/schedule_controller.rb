@@ -1,15 +1,6 @@
 class ScheduleController < ApplicationController
 
-  def min_time
-    @min_time ||= Program.order('starttime').limit(1)[0].starttime
-  end
-
-  def max_time
-    @max_time ||= Program.order('endtime DESC').limit(1)[0].endtime
-  end
-
-
-  def index
+  def index # angular.js version
   end
 
   def show
@@ -20,27 +11,21 @@ class ScheduleController < ApplicationController
   def schedule
     meth = params[:reset] ? :config_from_yaml : :ensure_config
     SchedResource.send( meth, session )
-    # SchedResource.config_from_yaml if params[:reset]
-    # SchedResource.ensure_config session
-    #
-    param_defaults params
 
+    param_defaults params
     get_data_for_time_span
     respond_to do |format|
       format.html
       format.json do
 
-        minTime = 2 ** 31
         @blockss.each do |rsrc, blocks|
           blocks.each do |block|
             block.starttime =  block.starttime.to_i
             block.endtime   =  block.endtime.to_i
-            minTime = block.starttime if block.starttime < minTime
           end
         end
         @blockss['meta'] = {
-          rsrcs: @rsrcs, minTime: minTime,
-          min_time: min_time, max_time: max_time,
+          rsrcs: @rsrcs, min_time: min_time, max_time: max_time,
           t1: @t1.to_i, t2: @t2.to_i, inc: @inc,
         }
         render json: @blockss
@@ -63,6 +48,14 @@ class ScheduleController < ApplicationController
 
 
   private
+
+  def min_time
+    @min_time ||= Program.order('starttime').first.starttime.to_i
+  end
+
+  def max_time
+    @max_time ||= Program.order('endtime DESC').first.endtime.to_i
+  end
 
   def param_defaults(p = {})
     @t1 = p[:t1] || time_default

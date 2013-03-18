@@ -46,7 +46,7 @@ a:visited               { color: white;  text-decoration: none;}
 #positioned-container   { overflow:         hidden;
                           margin:           1px;
                           margin-top:       0px;
-                          width:            20000px;
+                          width:            140000px; 
                           position:         relative;
                         }
 

@@ -52,8 +52,7 @@ function justify_left (scrollLeft, blockdivs) {
 
   var scrollRight = scrollLeft + TimePix.pixWindow,
       bdivs       = may_straddle (scrollLeft, scrollRight, blockdivs);  
-
-  if (! bdivs) {return}
+  if (! bdivs.length) {return}
 
   justify_left_1 ( scrollLeft,  common_data( bdivs.shift() ) );  
 
@@ -87,6 +86,7 @@ function justify (scrollLeft, blockdivs) {
   // sort_em(blockdivs)
   var scrollRight = scrollLeft + TimePix.pixWindow,
       bdivs       = may_straddle (scrollLeft, scrollRight, blockdivs);
+  if (! bdivs.length) {return}
 
   if (bdivs.length == 1)
     straddles_both( scrollLeft, scrollRight, common_data(bdivs[0]) )
