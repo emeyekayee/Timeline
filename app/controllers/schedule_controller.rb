@@ -17,17 +17,7 @@ class ScheduleController < ApplicationController
     respond_to do |format|
       format.html
       format.json do
-
-        @blockss.each do |rsrc, blocks|
-          blocks.each do |block|
-            block.starttime =  block.starttime.to_i
-            block.endtime   =  block.endtime.to_i
-          end
-        end
-        @blockss['meta'] = {
-          rsrcs: @rsrcs, min_time: min_time, max_time: max_time,
-          t1: @t1.to_i, t2: @t2.to_i, inc: @inc,
-        }
+        json_adjustments
         render json: @blockss
       end
     end
@@ -48,6 +38,19 @@ class ScheduleController < ApplicationController
 
 
   private
+
+  def json_adjustments
+    @blockss.each do |rsrc, blocks|
+      blocks.each do |block|
+        block.starttime =  block.starttime.to_i
+        block.endtime   =  block.endtime.to_i
+      end
+    end
+    @blockss['meta'] = {
+      rsrcs: @rsrcs, min_time: min_time, max_time: max_time,
+      t1: @t1.to_i, t2: @t2.to_i, inc: @inc,
+    }
+  end
 
   def min_time
     @min_time ||= Program.order('starttime').first.starttime.to_i
