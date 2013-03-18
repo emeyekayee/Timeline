@@ -69,10 +69,14 @@ desc <<-DESC
 DESC
 task :update_mythconverg_db do # , :roles => :mysql_master
 
+  threads = []
   prod_db_hosts.each do |prod_db_host|
-    `scp -i ~/.ec2/gpg-keypair #{dump_file} #{prod_db_host}:#{dump_file}`
-    `ssh -i ~/.ec2/gpg-keypair #{prod_db_host} "zcat #{dump_file} | mysql -u root mythconverg"`
+    threads <<Thread.new(prod_db_host) do |host|
+      `scp -i ~/.ec2/gpg-keypair #{dump_file} #{host}:#{dump_file}`
+      `ssh -i ~/.ec2/gpg-keypair #{host} "zcat #{dump_file} | mysql -u root mythconverg"`
+    end
   end
+  threads.each{|t| t.join }
 
 end
 
