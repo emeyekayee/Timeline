@@ -25,10 +25,10 @@ class ScheduleController < ApplicationController
 
     param_defaults params
     get_data_for_time_span
-    respond_to do |format|
-      format.html
-      format.json { render json: @blockss }
-    end
+    # respond_to do |format|
+    #   format.html
+    #   format.json { render json: @blockss }
+    # end
   end
 
   def test
