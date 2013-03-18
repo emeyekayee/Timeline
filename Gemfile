@@ -19,6 +19,8 @@ group :assets do
   gem 'libv8', '~> 3.11.8'
 
   gem 'uglifier', '>= 1.0.3'
+
+  gem 'angularjs-rails'
 end
 
 group :development, :test do
@@ -27,13 +29,14 @@ group :development, :test do
   gem 'rb-readline'
   gem 'ffi', "~> 1.0.11"
   gem 'sys-uname', "~> 0.9.0"
+  gem 'binding_of_caller'
 end
 
 group :development do
-  gem 'autotest', "~> 4.4.6"
-  gem 'autotest-rails-pure', "~> 4.1.2"
-  gem 'autotest-fsevent', "~> 0.2.8"
-  gem 'autotest-growl', "~> 0.2.16"
+  # gem 'autotest', "~> 4.4.6"
+  # gem 'autotest-rails-pure', "~> 4.1.2"
+  # gem 'autotest-fsevent', "~> 0.2.8"
+  # gem 'autotest-growl', "~> 0.2.16"
 
   gem 'looksee'
   gem 'better_errors'

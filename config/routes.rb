@@ -1,5 +1,6 @@
 Tvg::Application.routes.draw do
-  get "schedule/index"
+  # Reserved for json / angular.js version
+  # get "schedule/index"
 
   get "schedule/show"
 

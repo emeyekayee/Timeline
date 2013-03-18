@@ -1,7 +1,6 @@
 class ScheduleController < ApplicationController
-  def index
-    schedule
-    render :action => 'schedule'
+
+  def index # angular.js version
   end
 
   def show
@@ -10,25 +9,24 @@ class ScheduleController < ApplicationController
   end
 
   def schedule
-    SchedResource.send( params[:reset] ? :config_from_yaml : :ensure_config,
-                        session )
+    meth = params[:reset] ? :config_from_yaml : :ensure_config
+    SchedResource.send( meth, session )
+
     param_defaults params
     get_data_for_time_span
     respond_to do |format|
       format.html
-      format.json { render json: @blockss }
+      format.json do
+        json_adjustments
+        render json: @blockss
+      end
     end
   end
 
   def groupupdate
     SchedResource.ensure_config session
-
     param_defaults params
     get_data_for_time_span
-    # respond_to do |format|
-    #   format.html
-    #   format.json { render json: @blockss }
-    # end
   end
 
   def test
@@ -38,9 +36,30 @@ class ScheduleController < ApplicationController
     config.keys.each{|key| @text << "\n#{key}:\n" + config[key].inspect}
   end
 
-  
+
   private
-  
+
+  def json_adjustments
+    @blockss.each do |rsrc, blocks|
+      blocks.each do |block|
+        block.starttime =  block.starttime.to_i
+        block.endtime   =  block.endtime.to_i
+      end
+    end
+    @blockss['meta'] = {
+      rsrcs: @rsrcs, min_time: min_time, max_time: max_time,
+      t1: @t1.to_i, t2: @t2.to_i, inc: @inc,
+    }
+  end
+
+  def min_time
+    @min_time ||= Program.order('starttime').first.starttime.to_i
+  end
+
+  def max_time
+    @max_time ||= Program.order('endtime DESC').first.endtime.to_i
+  end
+
   def param_defaults(p = {})
     @t1 = p[:t1] || time_default
     @t2 = p[:t2] || @t1 + SchedResource.visible_time
@@ -48,10 +67,7 @@ class ScheduleController < ApplicationController
   end
 
   def time_default
-    z_offset = ActiveSupport::TimeZone['Pacific Time (US & Canada)'].utc_offset - 
-               Time.now.utc_offset   # Typically, for deployment to UTC server 
-
-    t_now = Time.now + z_offset
+    t_now = Time.now
     t_now.change :min => (t_now.min/15) * 15
   end
 

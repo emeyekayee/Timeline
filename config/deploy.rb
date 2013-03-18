@@ -1,5 +1,4 @@
 require "bundler/capistrano"
-# require 'fast_git_deploy/enable'
 
 set :application, "tvg"
 set :repository,  "https://github.com/emeyekayee/Timeline.git"
@@ -11,7 +10,6 @@ set :branch, "AWS-chef-deploy"
 
 default_run_options[:pty] = true
 ssh_options[:forward_agent] = true
-# ssh_options[:keys] = [File.join(ENV["HOME"], ".vagrant.d", "insecure_private_key")]
 ssh_options[:keys] = [File.expand_path('~/.ec2/gpg-keypair')]
 
 role :app, "tvg.test"
@@ -52,7 +50,7 @@ set :from_db_host, 'cannon@mjc3'
 set :dump_file,    '/tmp/mythconverg.sql.gz'
 set :dcmd,         "mysqldump -u mythtv -pXdl5bjo6 mythconverg | " +
                    "gzip - >#{dump_file}"
-set :prod_db_host, 'ubuntu@prod1.emeyekayee.com'
+set :prod_db_hosts, ['ubuntu@prod2.emeyekayee.com', 'ubuntu@prod4.emeyekayee.com']
 
 desc <<-DESC
   Dump the local database for export to production database.
@@ -71,9 +69,10 @@ desc <<-DESC
 DESC
 task :update_mythconverg_db do # , :roles => :mysql_master
 
-  `scp -i ~/.ec2/gpg-keypair #{dump_file} #{prod_db_host}:#{dump_file}`
-
-  `ssh -i ~/.ec2/gpg-keypair #{prod_db_host} "zcat #{dump_file} | mysql -u root mythconverg"`
+  prod_db_hosts.each do |prod_db_host|
+    `scp -i ~/.ec2/gpg-keypair #{dump_file} #{prod_db_host}:#{dump_file}`
+    `ssh -i ~/.ec2/gpg-keypair #{prod_db_host} "zcat #{dump_file} | mysql -u root mythconverg"`
+  end
 
 end
 

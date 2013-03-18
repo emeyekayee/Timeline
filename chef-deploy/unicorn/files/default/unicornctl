@@ -4,9 +4,11 @@
 # See http://unicorn.bogomips.org/SIGNALS.html for an explanation of each signal
 #
 
-SIGNALS_MAP = {"restart" => "USR2", "force_shutdown" => "TERM", "graceful_shutdown" => "QUIT",
-               "reopen_logs" => "USR1", "restart_workers" => "HUP", "stop_workers" => "WINCH",
-               "add_worker" => "TTIN", "remove_worker" => "TTOU"}
+SIGNALS_MAP = { "restart" => "USR2", "force_shutdown" => "TERM",
+                "graceful_shutdown" => "QUIT",
+                "reopen_logs" => "USR1", "restart_workers" => "HUP",
+                "stop_workers" => "WINCH",
+                "add_worker" => "TTIN", "remove_worker" => "TTOU"}
 
 def usage
  puts "unicornctl <command> [pid_path]"

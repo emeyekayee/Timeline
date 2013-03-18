@@ -14,9 +14,10 @@ class ResourceUseBlock
 
   delegate  :kind,      :to => :@rsrc
 
-  delegate  :starttime, :endtime,  :css_classes,     :block_label,
-            :title,     :subtitle, :description,     :stars,
-            :airdate,   :category, :previouslyshown,
+  delegate  :starttime=, :endtime=,  
+            :starttime,  :endtime,  :css_classes,     :block_label,
+            :title,      :subtitle, :description,     :stars,
+            :airdate,    :category, :previouslyshown,
       :to => :@blk
 
   def initialize(rsrc, blk)
