@@ -31,6 +31,7 @@ set :public_children, []               # Yes, this is overkill.
 
 after "deploy:update_code" do  
   run "cd #{release_path}/config && ln -nfs #{shared_path}/config/database.yml ."
+  run "cd #{current_path} && bundle install && bundle exec rake assets:precompile"
 end
 
 after "deploy:setup" do
