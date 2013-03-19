@@ -35,7 +35,7 @@ end
 
 after "deploy:setup" do
   deploy.fast_git_setup.clone_repository
-  run "cd #{current_path} && bundle install && rake assets:precompile"
+  run "cd #{current_path} && bundle install && bundle exec rake assets:precompile"
 end
 
 namespace :unicorn do
