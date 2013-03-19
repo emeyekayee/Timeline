@@ -1,4 +1,5 @@
 require "bundler/capistrano"
+require 'json'
 
 set :application, "tvg"
 set :repository,  "https://github.com/emeyekayee/Timeline.git"
@@ -12,9 +13,14 @@ default_run_options[:pty] = true
 ssh_options[:forward_agent] = true
 ssh_options[:keys] = [File.expand_path('~/.ec2/gpg-keypair')]
 
-role :app, "tvg.test"
-role :web, "tvg.test"
-role :db,  "tvg.test", :primary => true
+here = File.dirname(__FILE__)
+node_path = File.join( here,  '../chef-deploy/etc/chef/node.json' )
+node = JSON.parse( File.read node_path )
+
+role :app, "node['hostname']"
+role :web, "node['hostname']"
+role :db,  "node['hostname']", :primary => true
+
 
 set :normalize_asset_timestamps, false # task :finalize_update failing from
                                        # images, etc not being under .../public
@@ -50,7 +56,11 @@ set :from_db_host, 'cannon@mjc3'
 set :dump_file,    '/tmp/mythconverg.sql.gz'
 set :dcmd,         "mysqldump -u mythtv -pXdl5bjo6 mythconverg | " +
                    "gzip - >#{dump_file}"
-set :prod_db_hosts, ['ubuntu@prod2.emeyekayee.com', 'ubuntu@prod4.emeyekayee.com']
+
+
+set :prod_db_hosts, [ 'ubuntu@' + node['hostname'], 
+                      'ubuntu@' + node['other_db_host']
+                     ]
 
 desc <<-DESC
   Dump the local database for export to production database.
