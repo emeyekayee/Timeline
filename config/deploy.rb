@@ -17,9 +17,9 @@ here = File.dirname(__FILE__)
 node_path = File.join( here,  '../chef-deploy/etc/chef/node.json' )
 node = JSON.parse( File.read node_path )
 
-role :app, "node['hostname']"
-role :web, "node['hostname']"
-role :db,  "node['hostname']", :primary => true
+role :app, node['hostname']
+role :web, node['hostname']
+role :db,  node['hostname'], :primary => true
 
 
 set :normalize_asset_timestamps, false # task :finalize_update failing from
