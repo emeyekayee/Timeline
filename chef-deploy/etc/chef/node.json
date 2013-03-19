@@ -1,7 +1,10 @@
 {
-  "run_list": ["recipe[mysql::server]", "recipe[rails]"],
+  "run_list": ["recipe[nginx]", "recipe[mysql::server]", "recipe[rails]"],
+
   "hostname": "prod2.emeyekayee.com",
+
   "other_db_host": "prod4.emeyekayee.com"
+
   "mysql": { "server_root_password": "",
              "server_repl_password": "",
              "server_debian_password": ""
