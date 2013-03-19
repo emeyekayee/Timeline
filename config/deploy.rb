@@ -35,13 +35,14 @@ end
 
 after "deploy:setup" do
   deploy.fast_git_setup.clone_repository
-  run "cd #{current_path} && bundle install"
+  run "cd #{current_path} && bundle install && rake assets:precompile"
 end
 
 namespace :unicorn do
   desc "Start unicorn for this application"
   task :start do
-    run "cd #{current_path} && bundle exec unicorn -c /etc/unicorn/tvg.conf.rb -D"
+    run "export RAILS_ENV=production && cd #{current_path} && " + 
+        "bundle exec unicorn -c /etc/unicorn/tvg.conf.rb -D"
   end
 end
 
