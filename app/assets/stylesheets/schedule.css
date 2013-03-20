@@ -36,6 +36,8 @@ a:visited               { color: white;  text-decoration: none;}
                           overflow:         hidden;
                         }
 
+#schedule-container     { position:        relative; }
+
 #scrolling-container    { overflow-x:       scroll;
                           padding-bottom:   1px;
                           vertical-align:   top;
@@ -52,11 +54,12 @@ a:visited               { color: white;  text-decoration: none;}
 
 #labels-container       { width:            60px;
                           vertical-align:   top;
-                          display:          inline-block;
+                          position:         absolute;
                         }
 
 #timespans-container    { vertical-align:   top;
-                          display:          inline-block;
+                          position:         absolute;
+                          left:             65px;
                         }
 
 #resource-labels        { position:         relative;
