@@ -138,13 +138,18 @@ function relocate (tl, nleft, nwidth) {
 
 //////////////////////////////////////////////////////////////////////////////
 
-
 /* Controllers */
 
 function ResourceListCtrl($scope, $http) {
   $.extend( $scope,
     {
+      init_display_parms: function () {
+        TimePix.set_display_parms()
+      },
+
       init_resources: function () {    
+        $scope.init_display_parms()
+        
         $scope.rsrcs    = UseBlock.rsrcs = TimePix.meta.rsrcs
         $scope.res_tags = [];   // ^^ Defines the order of rows
         $scope.rsrcs.forEach( function(rsrc) {

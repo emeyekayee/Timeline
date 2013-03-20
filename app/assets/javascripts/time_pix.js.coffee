@@ -1,6 +1,14 @@
 class @TimePix            # Ultimately, an angular $service
   constructor: -> null
 
+  @scroll_container: -> $('#scrolling-container')
+
+  @set_display_parms: => # bound
+    @pixWindow =  parseInt(window.innerWidth) - 110
+    @scroll_container().css( 'width', @pixWindow + 'px' )
+    $('#scrollbar-hider').css('width', @pixWindow + 61 + 'px' )
+
+  
   @baseTime: 0
   @timeWindow: (3 * 3600)
   @pixWindow: 750         # Matching width of #scrolling-container
@@ -51,7 +59,7 @@ class @TimePix            # Ultimately, an angular $service
     @secs_to_pix_scale @ux_time_offset(uxt)
 
   @scroll_to_ux_time: (uxt) ->
-    sc = $('#scrolling-container')
+    sc = @scroll_container()
     sc.scrollLeft( @ux_time_offset_pix(uxt) )
 
   @scroll_to_thi: ->
@@ -72,7 +80,7 @@ class @TimePix            # Ultimately, an angular $service
 
 
   @scroll_monitor: =>
-    sc = $('#scrolling-container')
+    sc = @scroll_container()
     if @scroll_monitor.old_scroll != sc.scrollLeft()
       @scroll_monitor.old_scroll = sc.scrollLeft()
       @scroll_monitor.scroll_timestamp = new Date()
